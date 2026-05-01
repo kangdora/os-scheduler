@@ -37,7 +37,7 @@ class FCFS:
         }
         return remain_queue, ready_queue, timeline, completion_time, priority_cores, runtime
 
-    def _has_running_core(self, priority_cores: list[Core], runtime: dict) -> bool:
+    def _has_running_core(self, priority_cores: list[Core], runtime: dict[str, ProcessorRuntime]) -> bool:
         """현재 실행 중인 코어가 하나라도 있는지 확인"""
         for core in priority_cores:
             if runtime[core.core_id].current_process is not None:
@@ -52,7 +52,7 @@ class FCFS:
     def _assign_to_idle_cores(
         self,
         priority_cores: list[Core],
-        runtime: dict,
+        runtime: dict[str, ProcessorRuntime],
         ready_queue: deque[Process],
         time: int,
     ) -> None:
@@ -69,7 +69,7 @@ class FCFS:
     def _tick_execute(
         self,
         priority_cores: list[Core],
-        runtime: dict,
+        runtime: dict[str, ProcessorRuntime],
         timeline: list[ExecutionBlock],
         completion_time: dict[str, int],
         time: int,
@@ -114,7 +114,7 @@ class FCFS:
                 finished_at = time + 1
                 timeline.append(
                     ExecutionBlock(
-                        processor_id=int(core.core_id),
+                        processor_id=core.core_id,
                         pid=process.pid,
                         start_time=core_runtime.start_time,
                         end_time=finished_at,

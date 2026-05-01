@@ -11,7 +11,7 @@ class Process:
 
 @dataclass
 class ExecutionBlock:
-    processor_id: int
+    processor_id: str
     pid: str | None
     start_time: int
     end_time: int
