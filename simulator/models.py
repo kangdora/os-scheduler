@@ -20,7 +20,7 @@ class ExecutionBlock:
 @dataclass
 class Response:
     ok: bool
-    data: dict | None
+    data: dict | "ScheduleResult" | None
     error: dict | None
 
 
@@ -36,5 +36,23 @@ class Request:
     processes: list[Process]
     time_quantum: int | None
     cores: list[Core]
+
+
+@dataclass
+class ProcessMetric:
+    pid: str
+    at: int
+    wt: float
+    ntt: float
+
+
+@dataclass
+class ScheduleResult:
+    timeline: list[ExecutionBlock]
+    process_metrics: list[ProcessMetric]
+    avg_wt: float
+    avg_ntt: float
+    total_energy: float
+    max_time: int
 
 
