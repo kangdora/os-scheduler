@@ -1,12 +1,12 @@
 from simulator.algorithm import ALGORITHM_SELECTER
-from simulator.models import Core, ExecutionBlock, Process
+from simulator.models import Core, Process, ScheduleResult
 
 
 def schedule(algorithm: str,
              processes: list[Process],
              cores: list[Core],
              time_quantum: int
-             ) -> list[ExecutionBlock]:
+             ) -> ScheduleResult:
     algo = ALGORITHM_SELECTER[algorithm]()
     if algorithm != "rr":
         return algo.run(processes, cores)
