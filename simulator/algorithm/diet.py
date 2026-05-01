@@ -3,7 +3,7 @@ from collections import deque
 from simulator.models import Core, ExecutionBlock, Process, ScheduleResult
 
 
-class CUSTOM:
+class DIET:
     def __init__(self):
         self.total_energy = 0.0
         self.max_time = 0

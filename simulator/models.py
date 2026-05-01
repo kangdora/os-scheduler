@@ -18,27 +18,6 @@ class ExecutionBlock:
 
 
 @dataclass
-class Response:
-    ok: bool
-    data: dict | "ScheduleResult" | None
-    error: dict | None
-
-
-@dataclass
-class Core:
-    core_id: str
-    core_type: Literal["P", "E"]
-
-
-@dataclass
-class Request:
-    algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn", "custom"]
-    processes: list[Process]
-    time_quantum: int | None
-    cores: list[Core]
-
-
-@dataclass
 class ProcessMetric:
     pid: str
     at: int
@@ -54,6 +33,27 @@ class ScheduleResult:
     avg_ntt: float
     total_energy: float
     max_time: int
+
+
+@dataclass
+class Response:
+    ok: bool
+    data: dict | ScheduleResult | None
+    error: dict | None
+
+
+@dataclass
+class Core:
+    core_id: str
+    core_type: Literal["P", "E"]
+
+
+@dataclass
+class Request:
+    algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn", "custom"]
+    processes: list[Process]
+    time_quantum: int | None
+    cores: list[Core]
 
 
 @dataclass
