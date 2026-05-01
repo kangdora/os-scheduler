@@ -3,7 +3,7 @@ from simulator.algorithm.rr import RR
 from simulator.algorithm.hrrn import HRRN
 from simulator.algorithm.spn import SPN
 from simulator.algorithm.srtn import SRTN
-from simulator.algorithm.custom import CUSTOM
+from simulator.algorithm.diet import DIET
 
 ALGORITHM_SELECTER = {
     "fcfs": FCFS,
@@ -11,5 +11,5 @@ ALGORITHM_SELECTER = {
     "hrrn": HRRN,
     "spn": SPN,
     "srtn": SRTN,
-    "custom": CUSTOM,
+    "diet": DIET,
 }
