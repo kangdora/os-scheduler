@@ -33,7 +33,8 @@ class Core:
 @dataclass
 class Request:
     algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn", "custom"]
-    processes: list[Process | None]
+    processes: list[Process]
+    time_quantum: int | None
     cores: list[Core]
 
 
