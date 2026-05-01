@@ -56,3 +56,12 @@ class ScheduleResult:
     max_time: int
 
 
+@dataclass
+class ProcessorRuntime:
+    current_process: Process | None
+    remaining_work: int
+    start_time: int
+    was_active_last_tick: bool
+    elapsed_time: int
+
+

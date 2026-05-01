@@ -1,7 +1,7 @@
 from collections import deque
 
 from simulator.core_spec import CORE_SPECS
-from simulator.models import Core, ExecutionBlock, Process, ProcessMetric, ScheduleResult
+from simulator.models import Core, ExecutionBlock, Process, ProcessMetric, ProcessorRuntime, ScheduleResult
 
 
 class FCFS:
@@ -26,7 +26,13 @@ class FCFS:
         completion_time: dict[str, int] = {}
         priority_cores = sorted(cores, key=lambda c: 0 if c.core_type == "P" else 1)
         runtime = {
-            c.core_id: {"proc": None, "remain": 0, "start": 0, "was_active": False}
+            c.core_id: ProcessorRuntime(
+                current_process=None,
+                remaining_work=0,
+                start_time=0,
+                was_active_last_tick=False,
+                elapsed_time=0,
+            )
             for c in priority_cores
         }
         return remain_queue, ready_queue, timeline, completion_time, priority_cores, runtime
@@ -34,7 +40,7 @@ class FCFS:
     def _has_running_core(self, priority_cores: list[Core], runtime: dict) -> bool:
         """현재 실행 중인 코어가 하나라도 있는지 확인"""
         for core in priority_cores:
-            if runtime[core.core_id]["proc"] is not None:
+            if runtime[core.core_id].current_process is not None:
                 return True
         return False
 
@@ -53,11 +59,12 @@ class FCFS:
         """Idle 코어에 FCFS 순서대로 프로세스를 할당"""
         for core in priority_cores:
             core_runtime = runtime[core.core_id]
-            if core_runtime["proc"] is None and ready_queue:
+            if core_runtime.current_process is None and ready_queue:
                 process = ready_queue.popleft()
-                core_runtime["proc"] = process
-                core_runtime["remain"] = process.burst_time
-                core_runtime["start"] = time
+                core_runtime.current_process = process
+                core_runtime.remaining_work = process.burst_time
+                core_runtime.start_time = time
+                core_runtime.elapsed_time = 0
 
     def _tick_execute(
         self,
@@ -75,46 +82,48 @@ class FCFS:
         """
         for core in priority_cores:
             core_runtime = runtime[core.core_id]
-            process = core_runtime["proc"]
+            process = core_runtime.current_process
             if process is None:
                 # 실행 중인 작업이 없으면 이번 tick은 비활성 상태
-                core_runtime["was_active"] = False
+                core_runtime.was_active_last_tick = False
                 continue
 
             core_spec = CORE_SPECS[core.core_type]
             # 실행 중에는 동작 전력 소모
             tick_energy = core_spec["run_power"]
             # 직전 tick이 idle이면 이번 tick 시작 시 시동 전력 추가
-            if not core_runtime["was_active"]:
+            if not core_runtime.was_active_last_tick:
                 tick_energy += core_spec["startup_power"]
             self.total_energy += tick_energy
 
             # 이번 1초에 처리 가능한 일 양 계산
             processable_work = core_spec["speed"]
-            remaining_work = core_runtime["remain"]
+            remaining_work = core_runtime.remaining_work
             if remaining_work <= processable_work:
                 processed_work = remaining_work
             else:
                 processed_work = processable_work
 
             # 남은 일 업데이트
-            core_runtime["remain"] = remaining_work - processed_work
-            core_runtime["was_active"] = True
+            core_runtime.remaining_work = remaining_work - processed_work
+            core_runtime.was_active_last_tick = True
+            core_runtime.elapsed_time += 1
 
             # 작업이 끝나면 timeline/completion_time 기록 후 코어 비움
-            if core_runtime["remain"] == 0:
+            if core_runtime.remaining_work == 0:
                 finished_at = time + 1
                 timeline.append(
                     ExecutionBlock(
                         processor_id=int(core.core_id),
                         pid=process.pid,
-                        start_time=core_runtime["start"],
+                        start_time=core_runtime.start_time,
                         end_time=finished_at,
                     )
                 )
                 completion_time[process.pid] = finished_at
-                core_runtime["proc"] = None
-                core_runtime["was_active"] = False
+                core_runtime.current_process = None
+                core_runtime.was_active_last_tick = False
+                core_runtime.elapsed_time = 0
 
     def _build_result(
         self,
