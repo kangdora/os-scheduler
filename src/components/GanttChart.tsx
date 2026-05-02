@@ -57,11 +57,18 @@ export default function GanttChart({
         >
           <div className="gantt__label">시간</div>
           <div className="gantt__time-row" style={{ gridTemplateColumns: tickGridTemplate }}>
-            {Array.from({ length: ticks }).map((_, i) => (
-              <span key={i}>{i + 1}</span>
+            {Array.from({ length: ticks + 1 }).map((_, i) => (
+              <span 
+                key={i} 
+                style={{ 
+                  transform: "translateX(-50%)",
+                  gridColumnStart: i + 1,
+                }}
+              >
+                {i}
+              </span>
             ))}
           </div>
-
           {cores.map((c, idx) => {
             const cpuColor = CPU_COLORS[c.colorIdx % CPU_COLORS.length];
             const blocks = blocksByCore.get(c.coreId) ?? [];
