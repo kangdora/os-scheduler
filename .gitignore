@@ -4,6 +4,7 @@ dist/
 *.local
 .env
 .env.*
+.claude
 !.env.example
 npm-debug.log*
 yarn-debug.log*
