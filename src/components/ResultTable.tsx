@@ -16,7 +16,7 @@ interface ResultTableProps {
 const STATUS_LABEL: Record<ProcStatus, { label: string; cls: string }> = {
   waiting: { label: "대기 중", cls: "status--waiting" },
   running: { label: "실행 중", cls: "status--running" },
-  done:    { label: "완료",   cls: "status--done"    },
+  done: { label: "완료", cls: "status--done" },
 };
 
 export default function ResultTable({
@@ -57,6 +57,7 @@ export default function ResultTable({
               <th>이름</th>
               <th>AT</th>
               <th>BT</th>
+              <th>TT</th>
               <th>WT</th>
               <th>NTT</th>
               <th>상태</th>
@@ -74,6 +75,7 @@ export default function ResultTable({
                   <td>{p.name}</td>
                   <td>{p.arrivalTime}</td>
                   <td>{p.burstTime}</td>
+                  <td>{m && status === "done" ? m.tt.toFixed(1) : "—"}</td>
                   <td>{m && status === "done" ? m.wt.toFixed(1) : "—"}</td>
                   <td>{m && status === "done" ? m.ntt.toFixed(2) : "—"}</td>
                   <td><span className={`status ${s.cls}`}>{s.label}</span></td>

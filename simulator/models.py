@@ -6,7 +6,6 @@ class Process:
     pid: str
     arrival_time: int
     burst_time: int
-    priority: int
 
 
 @dataclass
@@ -21,6 +20,7 @@ class ExecutionBlock:
 class ProcessMetric:
     pid: str
     at: int
+    tt: float
     wt: float
     ntt: float
 
@@ -50,7 +50,7 @@ class Core:
 
 @dataclass
 class Request:
-    algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn", "custom"]
+    algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn", "diet"]
     processes: list[Process]
     time_quantum: int | None
     cores: list[Core]

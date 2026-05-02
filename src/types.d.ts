@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 declare global {
   interface Window {
     loadPyodide?: (opts: { indexURL: string }) => Promise<PyodideInterface>;

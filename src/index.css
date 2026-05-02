@@ -156,14 +156,14 @@ input, select {
 
 /* ===================== Process table ===================== */
 .proc-table-wrap {
-  max-height: 360px;
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
 }
 .proc-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 6px;
-  font-size: 13px;
+  border-spacing: 0 3px;
+  font-size: 12.5px;
 }
 .proc-table th {
   text-align: left;
@@ -173,7 +173,7 @@ input, select {
   padding: 0 4px;
 }
 .proc-table td {
-  padding: 6px 4px;
+  padding: 3px 4px;
   vertical-align: middle;
 }
 .proc-table tbody tr {
@@ -207,11 +207,11 @@ input, select {
 }
 .cell-input {
   width: 64px;
-  padding: 4px 8px;
+  padding: 3px 7px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
-  font-size: 12.5px;
+  font-size: 12px;
 }
 .cell-input--narrow { width: 52px; }
 .cell-input--name { width: 80px; }
@@ -305,7 +305,7 @@ input, select {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--accent-bg, #fde6c4);
+  background: #fde6c4;
   opacity: 0.5;
 }
 .cpu__num {
@@ -513,7 +513,6 @@ input, select {
 .gantt__time-row {
   grid-column: 2;
   display: grid;
-  grid-template-columns: repeat(var(--ticks), var(--cell));
   font-size: 11px;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
@@ -540,10 +539,8 @@ input, select {
   position: relative;
   height: 30px;
   display: grid;
-  grid-template-columns: repeat(var(--ticks), var(--cell));
   background-image:
     linear-gradient(to right, var(--line) 1px, transparent 1px);
-  background-size: var(--cell) 100%;
   border-radius: 8px;
 }
 .gantt__block {
@@ -562,15 +559,6 @@ input, select {
   white-space: nowrap;
   transition: width 0.2s ease;
 }
-.gantt__legend {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.gantt__legend .pid-pill { font-size: 11px; }
-
 /* ===================== Modal ===================== */
 .modal-overlay {
   position: fixed;

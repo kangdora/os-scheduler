@@ -34,7 +34,7 @@ export function deriveAtTick(
   const arrived = processes.filter((p) => p.arrivalTime <= tick);
   const ready = arrived
     .filter((p) => !runningPids.has(p.pid) && !completedPids.has(p.pid))
-    .sort((a, b) => a.priority - b.priority || a.arrivalTime - b.arrivalTime)
+    .sort((a, b) => a.arrivalTime - b.arrivalTime || a.pid.localeCompare(b.pid))
     .map((p) => p.pid);
 
   for (const p of processes) {

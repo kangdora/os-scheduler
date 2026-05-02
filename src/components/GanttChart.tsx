@@ -25,6 +25,7 @@ export default function GanttChart({
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
   const ticks = Math.max(maxTime, 1);
   const cellPx = expanded ? 48 : 36;
+  const tickGridTemplate = `repeat(${ticks}, ${cellPx}px)`;
 
   const blocksByCore = new Map<string, ExecutionBlock[]>();
   for (const c of cores) blocksByCore.set(c.coreId, []);
@@ -52,11 +53,10 @@ export default function GanttChart({
           className="gantt"
           style={{
             ["--cell" as string]: `${cellPx}px`,
-            ["--ticks" as string]: ticks,
           }}
         >
           <div className="gantt__label">시간</div>
-          <div className="gantt__time-row" style={{ ["--ticks" as string]: ticks }}>
+          <div className="gantt__time-row" style={{ gridTemplateColumns: tickGridTemplate }}>
             {Array.from({ length: ticks }).map((_, i) => (
               <span key={i}>{i + 1}</span>
             ))}
@@ -72,7 +72,10 @@ export default function GanttChart({
                 </div>
                 <div
                   className="gantt__track"
-                  style={{ ["--ticks" as string]: ticks }}
+                  style={{
+                    gridTemplateColumns: tickGridTemplate,
+                    backgroundSize: `${cellPx}px 100%`,
+                  }}
                 >
                   {blocks.map((b, bi) => {
                     if (b.start_time >= currentTick) return null;
@@ -109,17 +112,6 @@ export default function GanttChart({
             );
           })}
         </div>
-      </div>
-
-      <div className="gantt__legend">
-        {processes.map((p) => {
-          const color = PROCESS_COLORS[p.colorIdx % PROCESS_COLORS.length];
-          return (
-            <span key={p.pid} className="pid-pill" style={{ background: color.pill }}>
-              {p.pid} · {p.name}
-            </span>
-          );
-        })}
       </div>
     </section>
   );

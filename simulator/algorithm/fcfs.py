@@ -133,21 +133,21 @@ class FCFS:
     ) -> ScheduleResult:
         """
         완료 시각 기준으로 프로세스 메트릭을 계산해 결과를 생성
-        TAT = completion - arrival
-        WT = TAT - burst
-        NTT = TAT / burst
+        TT = completion - arrival
+        WT = max(0, TT - burst)
+        NTT = max(1, TT / burst)
         """
         process_metrics: list[ProcessMetric] = []
         total_wt = 0.0
         total_ntt = 0.0
         for process in sorted(processes, key=lambda x: x.pid):
             at = process.arrival_time
-            tat = completion_time[process.pid] - at
-            wt = tat - process.burst_time
-            ntt = tat / process.burst_time
+            tt = max(0.0, float(completion_time[process.pid] - at))
+            wt = max(0.0, tt - float(process.burst_time))
+            ntt = max(1.0, tt / float(process.burst_time))
             total_wt += wt
             total_ntt += ntt
-            process_metrics.append(ProcessMetric(pid=process.pid, at=at, wt=wt, ntt=ntt))
+            process_metrics.append(ProcessMetric(pid=process.pid, at=at, tt=tt, wt=wt, ntt=ntt))
 
         process_count = len(processes)
         avg_wt = total_wt / process_count if process_count else 0.0

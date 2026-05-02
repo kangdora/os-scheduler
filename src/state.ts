@@ -5,7 +5,6 @@ export interface ProcessUI {
   name: string;
   arrivalTime: number;
   burstTime: number;
-  priority: number;
   appetite: number;
   colorIdx: number;
 }
@@ -66,7 +65,6 @@ export function makeBlankProcess(processes: ProcessUI[]): ProcessUI {
     name: nextHamsterName(processes),
     arrivalTime: 0,
     burstTime: 1,
-    priority: 1,
     appetite: 0,
     colorIdx: nextColorIdx(processes),
   };
@@ -75,14 +73,12 @@ export function makeBlankProcess(processes: ProcessUI[]): ProcessUI {
 export function makeRandomProcess(processes: ProcessUI[]): ProcessUI {
   const at = Math.floor(Math.random() * 8);
   const bt = Math.floor(Math.random() * 9) + 1;
-  const priority = Math.floor(Math.random() * 5) + 1;
   const appetite = Math.floor(Math.random() * 101);
   return {
     pid: nextPid(processes),
     name: nextHamsterName(processes),
     arrivalTime: at,
     burstTime: bt,
-    priority,
     appetite,
     colorIdx: nextColorIdx(processes),
   };
@@ -99,9 +95,9 @@ export function defaultCores(): CoreUI[] {
 
 export function defaultProcesses(): ProcessUI[] {
   return [
-    { pid: "P1", name: "딸기",   arrivalTime: 0, burstTime: 8, priority: 2, appetite: 20, colorIdx: 0 },
-    { pid: "P2", name: "망고",   arrivalTime: 1, burstTime: 4, priority: 1, appetite: 35, colorIdx: 1 },
-    { pid: "P3", name: "블루베리", arrivalTime: 2, burstTime: 9, priority: 3, appetite: 50, colorIdx: 6 },
-    { pid: "P4", name: "키위",   arrivalTime: 3, burstTime: 5, priority: 2, appetite: 10, colorIdx: 3 },
+    { pid: "P1", name: "뽀송이", arrivalTime: 0, burstTime: 8, appetite: 20, colorIdx: 0 },
+    { pid: "P2", name: "모찌", arrivalTime: 1, burstTime: 4, appetite: 35, colorIdx: 1 },
+    { pid: "P3", name: "구름이", arrivalTime: 2, burstTime: 9, appetite: 50, colorIdx: 6 },
+    { pid: "P4", name: "토토", arrivalTime: 3, burstTime: 5, appetite: 10, colorIdx: 3 },
   ];
 }

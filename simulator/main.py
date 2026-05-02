@@ -8,8 +8,7 @@ class SimulatorApp:
             Process(
                 pid=p["pid"],
                 arrival_time=p["arrival_time"],
-                burst_time=p["burst_time"],
-                priority=p["priority"]
+                burst_time=p["burst_time"]
             )
 
             for p in request_json["processes"]

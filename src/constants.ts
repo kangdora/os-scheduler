@@ -1,4 +1,4 @@
-export const MAX_PROCESSES = 15;
+export const MAX_PROCESSES = 10;
 export const READY_QUEUE_VISIBLE = 5;
 export const CPU_COUNT = 4;
 
@@ -45,8 +45,8 @@ export const CPU_COLORS: ProcessColor[] = [
 ];
 
 export const HAMSTER_NAMES = [
-  "딸기", "망고", "블루베리", "키위", "복숭아",
-  "포도", "체리", "메론", "레몬", "코코넛",
-  "푸딩", "쿠키", "마카롱", "도넛", "초코",
-  "모찌", "두부", "치즈", "버터", "꿀호떡",
+  "뽀송이", "방울이", "모찌", "솜이", "꼬미",
+  "구름이", "루루", "보보", "토토", "달콩이",
+  "초코", "크림", "코코아", "밀키", "밤이",
+  "피넛", "치즈", "감자", "젤리", "쿠키",
 ];

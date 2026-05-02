@@ -6,6 +6,7 @@ interface ProcessBoxProps {
   processes: ProcessUI[];
   setProcesses: (next: ProcessUI[]) => void;
   disabled: boolean;
+  showAppetite: boolean;
 }
 
 function clampInt(v: string, min: number, max: number): number {
@@ -14,7 +15,7 @@ function clampInt(v: string, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-export default function ProcessBox({ processes, setProcesses, disabled }: ProcessBoxProps) {
+export default function ProcessBox({ processes, setProcesses, disabled, showAppetite }: ProcessBoxProps) {
   const full = processes.length >= MAX_PROCESSES;
 
   const update = (idx: number, patch: Partial<ProcessUI>) => {
@@ -60,8 +61,7 @@ export default function ProcessBox({ processes, setProcesses, disabled }: Proces
               <th>이름</th>
               <th>AT</th>
               <th>BT</th>
-              <th>우선순위</th>
-              <th>식탐</th>
+              {showAppetite && <th>식탐</th>}
               <th></th>
             </tr>
           </thead>
@@ -103,30 +103,19 @@ export default function ProcessBox({ processes, setProcesses, disabled }: Proces
                       onChange={(e) => update(idx, { burstTime: clampInt(e.target.value, 1, 99) })}
                     />
                   </td>
-                  <td>
-                    <span className="priority-pill" style={{ background: color.pill }}>{p.priority}</span>
-                    <input
-                      className="cell-input cell-input--narrow"
-                      style={{ marginLeft: 6 }}
-                      type="number"
-                      min={1}
-                      max={9}
-                      value={p.priority}
-                      disabled={disabled}
-                      onChange={(e) => update(idx, { priority: clampInt(e.target.value, 1, 9) })}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      className="cell-input cell-input--narrow"
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={p.appetite}
-                      disabled={disabled}
-                      onChange={(e) => update(idx, { appetite: clampInt(e.target.value, 0, 100) })}
-                    />
-                  </td>
+                  {showAppetite && (
+                    <td>
+                      <input
+                        className="cell-input cell-input--narrow"
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={p.appetite}
+                        disabled={disabled}
+                        onChange={(e) => update(idx, { appetite: clampInt(e.target.value, 0, 100) })}
+                      />
+                    </td>
+                  )}
                   <td className="row-actions">
                     <button
                       className="btn btn--icon btn--danger"

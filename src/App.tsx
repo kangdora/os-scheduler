@@ -35,7 +35,9 @@ export default function App() {
     getPyodide()
       .then(() => mounted && setPyodideReady(true))
       .catch((err) => mounted && setPyodideError(String(err)));
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const onStart = async () => {
@@ -58,7 +60,6 @@ export default function App() {
           pid: p.pid,
           arrival_time: p.arrivalTime,
           burst_time: p.burstTime,
-          priority: p.priority,
           appetite: p.appetite,
         })),
         cores: enabledCores.map((c) => ({ core_id: c.coreId, core_type: c.coreType })),
@@ -112,7 +113,12 @@ export default function App() {
       <Header />
 
       <div className="layout-top">
-        <ProcessBox processes={processes} setProcesses={setProcesses} disabled={editsLocked} />
+        <ProcessBox
+          processes={processes}
+          setProcesses={setProcesses}
+          disabled={editsLocked}
+          showAppetite={algorithm === "diet"}
+        />
         <AlgorithmPanel
           algorithm={algorithm}
           setAlgorithm={setAlgorithm}

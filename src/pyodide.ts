@@ -87,7 +87,6 @@ export interface SimRequest {
     pid: string;
     arrival_time: number;
     burst_time: number;
-    priority: number;
     appetite: number;
   }>;
   cores: Array<{ core_id: string; core_type: "P" | "E" }>;
@@ -104,6 +103,7 @@ export interface ExecutionBlock {
 export interface ProcessMetric {
   pid: string;
   at: number;
+  tt: number;
   wt: number;
   ntt: number;
 }
