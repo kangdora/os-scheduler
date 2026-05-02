@@ -35,6 +35,7 @@ class RR:
         time: int,
         time_quantum: int,
     ) -> None:
+        print()
         ...
 
     def _build_result(
