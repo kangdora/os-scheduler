@@ -48,6 +48,13 @@ class SRTN:
                 return True
         return False
 
+    def _has_space_core(self, priority_cores: list[Core], runtime: dict) -> bool:
+        """현재 빈 코어가 하나라도 있는지 확인"""
+        for core in priority_cores:
+            if runtime[core.core_id].current_process is None:
+                return True
+        return False
+
     def _move_arrived(self, remain_queue: deque, ready_queue: deque[Process], time: int) -> None:
         """
         현재 시각까지 도착한 프로세스를 준비 큐로 이동
@@ -78,33 +85,36 @@ class SRTN:
 
         for core in priority_cores:
             core_runtime = runtime[core.core_id]
-            if core_runtime.current_process and q_idx < len(ready_queue):
-                # 현재 코어에서 실행 중인 프로세스의 남은일 vs 레디 큐의 남은일
-                if ready_queue[q_idx].p_remaining_work < core_runtime.remaining_work: # 이거 괜찮나?
-                    process = core_runtime.current_process
-                    timeline.append(
-                        ExecutionBlock(
-                            processor_id=core.core_id,
-                            pid=process.pid,
-                            start_time=core_runtime.start_time,
-                            end_time=time,
+            has_running_core = self._has_space_core(priority_cores, runtime)
+            # 들어갈 자리가 있으면 선점하면 안됨.
+            if not has_running_core:
+                if core_runtime.current_process and q_idx < len(ready_queue):
+                    # 현재 코어에서 실행 중인 프로세스의 남은일 vs 레디 큐의 남은일
+                    if ready_queue[q_idx].p_remaining_work < core_runtime.remaining_work: # 이거 괜찮나?
+                        process = core_runtime.current_process
+                        timeline.append(
+                            ExecutionBlock(
+                                processor_id=core.core_id,
+                                pid=process.pid,
+                                start_time=core_runtime.start_time,
+                                end_time=time,
+                            )
                         )
-                    )
-                    # 프로세스의 남은일 갱신 (코어의 남은 작업량을 남은 일로 복사)
-                    process.p_remaining_work = core_runtime.remaining_work
+                        # 프로세스의 남은일 갱신 (코어의 남은 작업량을 남은 일로 복사)
+                        process.p_remaining_work = core_runtime.remaining_work
 
-                    # 실행 중이던 프로세스를 준비 큐로 되돌리고 남은 시간 기준으로 정렬
-                    ready_queue.append(process) # 여기 틀린듯 -> 아닌가? 할당될 때 레디큐에서 팝하니까 맞을텐데?
-                    sorted_processes = deque(sorted(ready_queue, key=lambda p: p.p_remaining_work))
-                    ready_queue.clear()
-                    ready_queue.extend(sorted_processes)
+                        # 실행 중이던 프로세스를 준비 큐로 되돌리고 남은 시간 기준으로 정렬
+                        ready_queue.append(process) # 여기 틀린듯 -> 아닌가? 할당될 때 레디큐에서 팝하니까 맞을텐데?
+                        sorted_processes = deque(sorted(ready_queue, key=lambda p: p.p_remaining_work))
+                        ready_queue.clear()
+                        ready_queue.extend(sorted_processes)
 
-                    # 선점할 수 있도록 코어 비우기
-                    core_runtime.current_process = None
-                    core_runtime.remaining_work = 0
+                        # 선점할 수 있도록 코어 비우기
+                        core_runtime.current_process = None
+                        core_runtime.remaining_work = 0
 
-                    # 이 프로세스는 선점에 쓰였으므로 다음 코어는 다음 프로세스와 비교
-                    q_idx += 1
+                        # 이 프로세스는 선점에 쓰였으므로 다음 코어는 다음 프로세스와 비교
+                        q_idx += 1
 
     def _assign_to_idle_cores(
         self,
