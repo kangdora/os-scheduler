@@ -68,24 +68,30 @@ class SRTN:
         timeline: list[ExecutionBlock],
         time: int,
     ) -> None:
-        """현재 실행 중인 프로세스보다 더 짧은(Remaining Time이 적은)
-        프로세스가 왔는지 체크하여 교체"""
+        """
+        현재 실행 중인 프로세스보다 더 짧은(Remaining Time이 적은)
+        프로세스가 왔는지 체크하여 교체
+        """
+        # 레디 큐이 몇 번째 프로세스와 비교할지 가리키는 인덱스
+        # 한 프로세스 때문에 모든 코어가 멈추는 현상 방지
+        q_idx = 0
+
         for core in priority_cores:
             core_runtime = runtime[core.core_id]
-            if core_runtime.current_process and ready_queue:
+            if core_runtime.current_process and q_idx < len(ready_queue):
                 # 현재 코어에서 실행 중인 프로세스의 남은일 vs 레디 큐의 남은일
-                if ready_queue[0].p_remaining_work < core_runtime.remaining_work: # 이거 괜찮나?
+                if ready_queue[q_idx].p_remaining_work < core_runtime.remaining_work: # 이거 괜찮나?
                     process = core_runtime.current_process
                     timeline.append(
                         ExecutionBlock(
                             processor_id=core.core_id,
                             pid=process.pid,
-                            start_time=core_runtime.start_time, # 이게 맞나? 계속 갱신해야하지 않나? -> 할당될 때 time으로 갱신해줌
+                            start_time=core_runtime.start_time,
                             end_time=time,
                         )
                     )
-                    # 프로세스의 남은일 갱신
-                    process.p_remaining_work = process.p_remaining_work - core_runtime.elapsed_time
+                    # 프로세스의 남은일 갱신 (코어의 남은 작업량을 남은 일로 복사)
+                    process.p_remaining_work = core_runtime.remaining_work
 
                     # 실행 중이던 프로세스를 준비 큐로 되돌리고 남은 시간 기준으로 정렬
                     ready_queue.append(process) # 여기 틀린듯 -> 아닌가? 할당될 때 레디큐에서 팝하니까 맞을텐데?
@@ -95,8 +101,10 @@ class SRTN:
 
                     # 선점할 수 있도록 코어 비우기
                     core_runtime.current_process = None
-                    core_runtime.remaining_work = 0 # 이거 꼭 해야되나? ->
+                    core_runtime.remaining_work = 0
 
+                    # 이 프로세스는 선점에 쓰였으므로 다음 코어는 다음 프로세스와 비교
+                    q_idx += 1
 
     def _assign_to_idle_cores(
         self,
@@ -156,6 +164,7 @@ class SRTN:
 
             # 남은 일 업데이트
             core_runtime.remaining_work = remaining_work - processed_work
+            process.p_remaining_work = core_runtime.remaining_work # tick 실행 직후에 프로세스 객체에도 값을 실시간으로 써줌.
             core_runtime.was_active_last_tick = True
             core_runtime.elapsed_time += 1
 
