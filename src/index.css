@@ -101,7 +101,7 @@ input, select {
 
 .combined-panel {
   display: grid;
-  grid-template-columns: minmax(300px, 1.2fr) 1px minmax(200px, 0.8fr);
+  grid-template-columns: minmax(330px, 1fr) 1px minmax(180px, 0.4fr);
   gap: 14px;
   padding: 14px 16px;
   overflow: hidden;
@@ -117,16 +117,19 @@ input, select {
 .algo-panel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
 }
 
 .algo-panel__field select,
 .algo-panel__field input {
-  width: 95%;
+  width: 85%;
   box-sizing: border-box;
+}
+
+.layout-bottom {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(640px, 2.2fr);
+  grid-template-columns: minmax(400px, 1fr) minmax(600px, 1.8fr);
   gap: 14px;
 }
 
@@ -167,7 +170,6 @@ input, select {
 .btn--big {
   padding: 10px 22px;
   font-size: 14px;
-  width: 100%;
   justify-content: center;
 }
 .btn--icon {
@@ -283,10 +285,11 @@ input, select {
 }
 .algo-panel__buttons {
   display: flex;
-  gap: 6px;
+  flex-direction:column;
   margin-top: auto;
+  align-items: center;
 }
-.algo-panel__buttons .btn { flex: 1; }
+.algo-panel__buttons .btn { width: fit-content; min-width: 140px; }
 
 /* ===================== CPU box ===================== */
 .cpu-row {
