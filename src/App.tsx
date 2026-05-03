@@ -113,26 +113,29 @@ export default function App() {
       <Header />
 
       <div className="layout-top">
-        <ProcessBox
-          processes={processes}
-          setProcesses={setProcesses}
-          disabled={editsLocked}
-          showAppetite={algorithm === "diet"}
-        />
-        <AlgorithmPanel
-          algorithm={algorithm}
-          setAlgorithm={setAlgorithm}
-          timeQuantum={timeQuantum}
-          setTimeQuantum={setTimeQuantum}
-          interval={interval}
-          setInterval={setInterval}
-          simState={playback.simState}
-          loading={running}
-          onStart={onStart}
-          onPause={playback.pause}
-          onResume={playback.resume}
-          onReset={onReset}
-        />
+        <div className="card combined-panel">
+          <ProcessBox
+            processes={processes}
+            setProcesses={setProcesses}
+            disabled={editsLocked}
+            showAppetite={algorithm === "diet"}
+          />
+          <div className="combined-panel__divider" />
+          <AlgorithmPanel
+            algorithm={algorithm}
+            setAlgorithm={setAlgorithm}
+            timeQuantum={timeQuantum}
+            setTimeQuantum={setTimeQuantum}
+            interval={interval}
+            setInterval={setInterval}
+            simState={playback.simState}
+            loading={running}
+            onStart={onStart}
+            onPause={playback.pause}
+            onResume={playback.resume}
+            onReset={onReset}
+          />
+        </div>
         <CoreBox
           cores={cores}
           setCores={setCores}

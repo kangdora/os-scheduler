@@ -94,12 +94,37 @@ input, select {
 
 .layout-top {
   display: grid;
-  grid-template-columns: minmax(330px, 1fr) minmax(220px, 0.7fr) minmax(700px, 2.5fr);
+  grid-template-columns: minmax(550px, 1.6fr) minmax(700px, 2.5fr);
   gap: 14px;
   align-items: stretch;
 }
 
-.layout-bottom {
+.combined-panel {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.2fr) 1px minmax(200px, 0.8fr);
+  gap: 14px;
+  padding: 14px 16px;
+  overflow: hidden;
+}
+
+.combined-panel__divider {
+  background: var(--line);
+  width: 1px;
+  height: calc(100%);
+  
+}
+
+.algo-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.algo-panel__field select,
+.algo-panel__field input {
+  width: 95%;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(320px, 1fr) minmax(640px, 2.2fr);
   gap: 14px;
