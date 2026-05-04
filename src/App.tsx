@@ -153,6 +153,7 @@ export default function App() {
           runningByCore={derived.runningByCore}
           readyPids={derived.readyPids}
           sleepPids={derived.sleepPids}
+          simState={playback.simState}
           disabled={editsLocked}
         />
       </div>

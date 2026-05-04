@@ -1,4 +1,4 @@
-export const MAX_PROCESSES = 10;
+export const MAX_PROCESSES = 15;
 export const READY_QUEUE_VISIBLE = 5;
 export const CPU_COUNT = 4;
 
