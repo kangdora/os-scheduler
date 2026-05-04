@@ -102,10 +102,16 @@ export default function App() {
     () => deriveAtTick(playback.tick, processes, result?.timeline ?? [], finished),
     [playback.tick, processes, result, finished],
   );
+  const readySnapshot = useMemo(() => {
+    if (algorithm !== "diet") return null;
+    return result?.ready_queue_priorities.find((snapshot) => snapshot.time === playback.tick) ?? null;
+  }, [algorithm, result, playback.tick]);
 
   const energy = result?.total_energy ?? 0;
   const metrics = result?.process_metrics ?? [];
   const maxTime = result?.max_time ?? 0;
+  const readyPids = readySnapshot ? readySnapshot.items.map((item) => item.pid) : derived.readyPids;
+  const readyPriorityByPid = new Map(readySnapshot?.items.map((item) => [item.pid, item.priority]) ?? []);
 
   if (!pyodideReady) {
     return (
@@ -155,7 +161,8 @@ export default function App() {
           setCores={setCores}
           processes={processes}
           runningByCore={derived.runningByCore}
-          readyPids={derived.readyPids}
+          readyPids={readyPids}
+          readyPriorityByPid={readyPriorityByPid}
           sleepPids={derived.sleepPids}
           simState={playback.simState}
           disabled={editsLocked}
