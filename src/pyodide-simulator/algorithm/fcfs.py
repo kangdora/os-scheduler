@@ -24,8 +24,8 @@ class FCFS:
         remain_queue = deque(sorted(processes, key=lambda p: (p.arrival_time, p.pid)))
         ready_queue: deque[Process] = deque([])
         timeline: list[ExecutionBlock] = []
-        completion_time: dict[str, float] = {}
-        calc_bt: dict[str, float] = {p.pid: 0.0 for p in processes}
+        completion_time: dict[str, int] = {}
+        calc_bt: dict[str, int] = {p.pid: 0 for p in processes}
         priority_cores = sorted(cores, key=lambda c: 0 if c.core_type == "P" else 1)
         runtime = {
             c.core_id: ProcessorRuntime(
@@ -74,7 +74,7 @@ class FCFS:
         runtime: dict[str, ProcessorRuntime],
         timeline: list[ExecutionBlock],
         completion_time: dict[str, int],
-        calc_bt: dict[str, float],
+        calc_bt: dict[str, int],
         time: int,
     ) -> None:
         """
@@ -107,9 +107,8 @@ class FCFS:
             else:
                 processed_work = processable_work
 
-            # 실제 걸린 시간 계산 (P코어: 일/2, E코어: 일/1)
-            time_spent = processed_work / core_spec["speed"]
-            calc_bt[process.pid] += time_spent
+            # 실제 걸린 시간 계산
+            calc_bt[process.pid] += 1
 
             # 남은 일 업데이트
             core_runtime.remaining_work = remaining_work - processed_work
@@ -118,14 +117,13 @@ class FCFS:
 
             # 작업이 끝나면 timeline/completion_time 기록 후 코어 비움
             if core_runtime.remaining_work == 0:
-                # 정확한 완료 시각(0.5단위)
-                finished_at = time + time_spent
+                finished_at = time + 1
                 timeline.append(
                     ExecutionBlock(
                         processor_id=core.core_id,
                         pid=process.pid,
                         start_time=core_runtime.start_time,
-                        end_time= time + 1, # 간트차트는 정수 단위
+                        end_time=finished_at,
                     )
                 )
                 completion_time[process.pid] = finished_at
@@ -137,7 +135,7 @@ class FCFS:
         self,
         processes: list[Process],
         timeline: list[ExecutionBlock],
-        calc_bt: dict[str, float],
+        calc_bt: dict[str, int],
         completion_time: dict[str, int],
     ) -> ScheduleResult:
         """

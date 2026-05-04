@@ -33,7 +33,7 @@ class ExecutionBlock:
 @dataclass
 class ProcessMetric:
     pid: str
-    bt: float
+    bt: int
     at: int
     tt: float
     wt: float
