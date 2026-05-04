@@ -74,7 +74,7 @@ export default function ResultTable({
                   <td><span className="pid-pill" style={{ background: color.pill }}>{p.pid}</span></td>
                   <td>{p.name}</td>
                   <td>{p.arrivalTime}</td>
-                  <td>{p.burstTime}</td>
+                  <td>{m && status === "done" ? m.bt.toFixed(1) : "—"}</td>
                   <td>{m && status === "done" ? m.tt.toFixed(1) : "—"}</td>
                   <td>{m && status === "done" ? m.wt.toFixed(1) : "—"}</td>
                   <td>{m && status === "done" ? m.ntt.toFixed(2) : "—"}</td>
