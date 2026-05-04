@@ -148,15 +148,15 @@ class RR:
         total_ntt = 0.0
 
         for p in sorted(processes, key=lambda x: x.pid):
-            tat = completion_time[p.pid] - p.arrival_time
-            wt = tat - p.burst_time
-            ntt = tat / p.burst_time
+            tt = completion_time[p.pid] - p.arrival_time
+            wt = tt - p.burst_time
+            ntt = tt / p.burst_time
 
             total_wt += wt
             total_ntt += ntt
 
             process_metrics.append(
-                ProcessMetric(pid=p.pid, at=p.arrival_time, wt=wt, ntt=ntt)
+                ProcessMetric(pid=p.pid, at=p.arrival_time, tt=tt, wt=wt, ntt=ntt)
             )
 
         n = len(processes)

@@ -11,13 +11,14 @@ interface CoreBoxProps {
   processes: ProcessUI[];
   runningByCore: Map<string, string>;
   readyPids: string[];
+  readyPriorityByPid: Map<string, number>;
   sleepPids: string[];
   simState: SimState;
   disabled: boolean;
 }
 
 export default function CoreBox(props: CoreBoxProps) {
-  const { cores, setCores, processes, runningByCore, readyPids, sleepPids, simState, disabled } = props;
+  const { cores, setCores, processes, runningByCore, readyPids, readyPriorityByPid, sleepPids, simState, disabled } = props;
 
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
 
@@ -59,7 +60,7 @@ export default function CoreBox(props: CoreBoxProps) {
                       bg={wheelColor.bg}
                       border={wheelColor.border}
                       size={120}
-                      variant={runningProc.appetite > 60 ? "fat" : "run"}
+                      variant="run"
                     />
                   )}
                 </div>
@@ -109,7 +110,12 @@ export default function CoreBox(props: CoreBoxProps) {
                 <div key={i} className={`queue__cell ${proc ? "" : "queue__cell--empty"}`}>
                   {proc && color ? (
                     <>
-                      <Hamster bg={color.bg} border={color.border} size={24} />
+                      <Hamster
+                        bg={color.bg}
+                        border={color.border}
+                        size={24}
+                        variant={(readyPriorityByPid.get(proc.pid) ?? 0) >= 60 ? "fat" : "idle"}
+                      />
                       <span className="pid-pill" style={{ background: color.pill }}>{proc.pid}</span>
                     </>
                   ) : null}
