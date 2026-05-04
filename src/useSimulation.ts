@@ -19,10 +19,18 @@ export function deriveAtTick(
 ): DerivedState {
   const runningByCore = new Map<string, string>();
   const completedPids = new Set<string>();
+  const sleepPids = new Set<string>();
   const statusByPid = new Map<string, ProcStatus>();
 
   for (const b of timeline) {
     if (!b.pid) continue;
+    if (b.processor_id === "eating_queue") {
+      if (b.start_time <= tick && tick < b.end_time) {
+        sleepPids.add(b.pid);
+      }
+      continue;
+    }
+
     if (b.start_time <= tick && tick < b.end_time) {
       runningByCore.set(b.processor_id, b.pid);
     }
@@ -33,13 +41,14 @@ export function deriveAtTick(
 
   const arrived = processes.filter((p) => p.arrivalTime <= tick);
   const ready = arrived
-    .filter((p) => !runningPids.has(p.pid) && !completedPids.has(p.pid))
+    .filter((p) => !runningPids.has(p.pid) && !sleepPids.has(p.pid) && !completedPids.has(p.pid))
     .sort((a, b) => a.arrivalTime - b.arrivalTime || a.pid.localeCompare(b.pid))
     .map((p) => p.pid);
 
   for (const p of processes) {
     if (completedPids.has(p.pid)) statusByPid.set(p.pid, "done");
     else if (runningPids.has(p.pid)) statusByPid.set(p.pid, "running");
+    else if (sleepPids.has(p.pid)) statusByPid.set(p.pid, "sleep");
     else statusByPid.set(p.pid, "waiting");
   }
 
@@ -47,7 +56,7 @@ export function deriveAtTick(
     for (const p of processes) statusByPid.set(p.pid, "done");
   }
 
-  return { runningByCore, readyPids: ready, sleepPids: [], statusByPid };
+  return { runningByCore, readyPids: ready, sleepPids: Array.from(sleepPids), statusByPid };
 }
 
 interface UseSimulationArgs {

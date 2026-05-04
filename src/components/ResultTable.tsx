@@ -2,7 +2,7 @@ import { PROCESS_COLORS } from "../constants";
 import type { ProcessUI } from "../state";
 import type { ProcessMetric } from "../pyodide";
 
-export type ProcStatus = "waiting" | "running" | "done";
+export type ProcStatus = "waiting" | "running" | "sleep" | "done";
 
 interface ResultTableProps {
   processes: ProcessUI[];
@@ -16,6 +16,7 @@ interface ResultTableProps {
 const STATUS_LABEL: Record<ProcStatus, { label: string; cls: string }> = {
   waiting: { label: "대기 중", cls: "status--waiting" },
   running: { label: "실행 중", cls: "status--running" },
+  sleep: { label: "I/O 대기 중", cls: "status--sleep" },
   done: { label: "완료", cls: "status--done" },
 };
 

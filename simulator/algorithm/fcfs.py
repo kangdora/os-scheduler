@@ -50,11 +50,11 @@ class FCFS:
             ready_queue.append(remain_queue.popleft())
 
     def _assign_to_idle_cores(
-        self,
-        priority_cores: list[Core],
-        runtime: dict[str, ProcessorRuntime],
-        ready_queue: deque[Process],
-        time: int,
+            self,
+            priority_cores: list[Core],
+            runtime: dict[str, ProcessorRuntime],
+            ready_queue: deque[Process],
+            time: int,
     ) -> None:
         """Idle 코어에 FCFS 순서대로 프로세스를 할당"""
         for core in priority_cores:
@@ -67,12 +67,12 @@ class FCFS:
                 core_runtime.elapsed_time = 0
 
     def _tick_execute(
-        self,
-        priority_cores: list[Core],
-        runtime: dict[str, ProcessorRuntime],
-        timeline: list[ExecutionBlock],
-        completion_time: dict[str, int],
-        time: int,
+            self,
+            priority_cores: list[Core],
+            runtime: dict[str, ProcessorRuntime],
+            timeline: list[ExecutionBlock],
+            completion_time: dict[str, int],
+            time: int,
     ) -> None:
         """
         각 코어를 1초 실행
@@ -126,25 +126,32 @@ class FCFS:
                 core_runtime.elapsed_time = 0
 
     def _build_result(
-        self,
-        processes: list[Process],
-        timeline: list[ExecutionBlock],
-        completion_time: dict[str, int],
+            self,
+            processes: list[Process],
+            timeline: list[ExecutionBlock],
+            completion_time: dict[str, int],
     ) -> ScheduleResult:
         """
         완료 시각 기준으로 프로세스 메트릭을 계산해 결과를 생성
         TT = completion - arrival
-        WT = max(0, TT - burst)
-        NTT = max(1, TT / burst)
+        WT = max(0, TT - service_ticks)
+        NTT = TT / service_ticks
         """
+        service_ticks: dict[str, int] = {}
+        for block in timeline:
+            if block.pid is None:
+                continue
+            service_ticks[block.pid] = service_ticks.get(block.pid, 0) + (block.end_time - block.start_time)
+
         process_metrics: list[ProcessMetric] = []
         total_wt = 0.0
         total_ntt = 0.0
         for process in sorted(processes, key=lambda x: x.pid):
             at = process.arrival_time
             tt = max(0.0, float(completion_time[process.pid] - at))
-            wt = max(0.0, tt - float(process.burst_time))
-            ntt = max(1.0, tt / float(process.burst_time))
+            service_time = float(service_ticks.get(process.pid, 0))
+            wt = max(0.0, tt - service_time)
+            ntt = tt / service_time if service_time > 0 else 0.0
             total_wt += wt
             total_ntt += ntt
             process_metrics.append(ProcessMetric(pid=process.pid, at=at, tt=tt, wt=wt, ntt=ntt))

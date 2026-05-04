@@ -134,17 +134,24 @@ class FCFS:
         """
         완료 시각 기준으로 프로세스 메트릭을 계산해 결과를 생성
         TT = completion - arrival
-        WT = max(0, TT - burst)
-        NTT = max(1, TT / burst)
+        WT = max(0, TT - service_ticks)
+        NTT = TT / service_ticks
         """
+        service_ticks: dict[str, int] = {}
+        for block in timeline:
+            if block.pid is None:
+                continue
+            service_ticks[block.pid] = service_ticks.get(block.pid, 0) + (block.end_time - block.start_time)
+
         process_metrics: list[ProcessMetric] = []
         total_wt = 0.0
         total_ntt = 0.0
         for process in sorted(processes, key=lambda x: x.pid):
             at = process.arrival_time
             tt = max(0.0, float(completion_time[process.pid] - at))
-            wt = max(0.0, tt - float(process.burst_time))
-            ntt = max(1.0, tt / float(process.burst_time))
+            service_time = float(service_ticks.get(process.pid, 0))
+            wt = max(0.0, tt - service_time)
+            ntt = tt / service_time if service_time > 0 else 0.0
             total_wt += wt
             total_ntt += ntt
             process_metrics.append(ProcessMetric(pid=process.pid, at=at, tt=tt, wt=wt, ntt=ntt))

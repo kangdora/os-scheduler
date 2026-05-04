@@ -1,19 +1,31 @@
-from simulator.models import Process, Core, Request, Response
+from simulator.models import Process, DietProcess, Core, Request, DietRequest, Response
 from simulator.scheduler import schedule
 
 
 class SimulatorApp:
-    def parse_request(self, request_json: dict) -> Request:
-        processes = [
-            Process(
-                pid=p["pid"],
-                arrival_time=p["arrival_time"],
-                burst_time=p["burst_time"]
-            )
+    def parse_request(self, request_json: dict) -> Request | DietRequest:
+        # DIET는 프론트에서 받은 appetite를 프로세스 내장 값으로 써야 하므로 별도 모델로 파싱한다.
+        if request_json["algorithm"] == "diet":
+            processes = [
+                DietProcess(
+                    pid=p["pid"],
+                    arrival_time=p["arrival_time"],
+                    burst_time=p["burst_time"],
+                    appetite=p["appetite"],
+                )
+                for p in request_json["processes"]
+            ]
+        else:
+            processes = [
+                Process(
+                    pid=p["pid"],
+                    arrival_time=p["arrival_time"],
+                    burst_time=p["burst_time"]
+                )
+                for p in request_json["processes"]
+            ]
 
-            for p in request_json["processes"]
-        ]
-
+        # 코어 입력은 모든 알고리즘이 같은 모델을 공유한다.
         cores = [
             Core(
                 core_id=c["core_id"],
@@ -22,6 +34,16 @@ class SimulatorApp:
             for c in request_json["cores"]
         ]
 
+        if request_json["algorithm"] == "diet":
+            # DietRequest는 processes 타입을 DietProcess로 고정해서 일반 요청과 섞이지 않게 한다.
+            return DietRequest(
+                algorithm=request_json["algorithm"],
+                processes=processes,
+                cores=cores,
+                time_quantum=request_json["time_quantum"]
+            )
+
+        # 일반 스케줄러 요청은 기존 Process 리스트를 그대로 사용한다.
         return Request(
             algorithm=request_json["algorithm"],
             processes=processes,

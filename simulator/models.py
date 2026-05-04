@@ -9,6 +9,20 @@ class Process:
 
 
 @dataclass
+class DietProcess(Process):
+    # DIET 전용 프로세스: 프론트에서 받은 식탐(appetite)을 tick별 I/O interrupt 확률로 보존한다.
+    appetite: int
+    # DIET의 기본 스케줄링 우선순위이며, ready 대기/CPU 하차 규칙에 따라 변한다.
+    priority: float = 0.0
+    # I/O interrupt 이후 ready queue에 복귀한 프로세스에 1틱 동안만 주는 진입 보너스다.
+    enter_bonus: float = 0.0
+    # enter_bonus를 제거하기까지 남은 tick 수다.
+    enter_bonus_ticks: int = 0
+    # 4초 이상 연속 실행으로 long decay가 적용됐는지 기록해 CPU 하차 감점 여부를 결정한다.
+    long_decay_applied: bool = False
+
+
+@dataclass
 class ExecutionBlock:
     processor_id: str
     pid: str | None
@@ -50,8 +64,16 @@ class Core:
 
 @dataclass
 class Request:
-    algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn", "diet"]
+    algorithm: Literal["fcfs", "rr", "hrrn", "spn", "srtn"]
     processes: list[Process]
+    time_quantum: int | None
+    cores: list[Core]
+
+
+@dataclass
+class DietRequest:
+    algorithm: Literal["diet"]
+    processes: list[DietProcess]
     time_quantum: int | None
     cores: list[Core]
 

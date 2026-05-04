@@ -1,3 +1,5 @@
+import waitingHamsterUrl from "../asset/waiting.png";
+
 interface HamsterProps {
   bg: string;
   border: string;
@@ -7,6 +9,20 @@ interface HamsterProps {
 
 export default function Hamster({ bg, border, size = 36, variant = "idle" }: HamsterProps) {
   const className = `hamster hamster--${variant}`;
+
+  if (variant === "run" || variant === "idle") {
+    return (
+      <img
+        className={className}
+        src={waitingHamsterUrl}
+        width={size}
+        height={size}
+        alt=""
+        aria-hidden
+      />
+    );
+  }
+
   return (
     <svg
       className={className}

@@ -1,4 +1,4 @@
-import type { PyodideInterface } from "./types";
+import type { PyodideInterface, SimRequest, SimResponse } from "./types";
 
 import mainPy from "../simulator/main.py?raw";
 import schedulerPy from "../simulator/scheduler.py?raw";
@@ -81,51 +81,11 @@ export function getPyodide(): Promise<PyodideInterface> {
   return pyodidePromise;
 }
 
-export interface SimRequest {
-  algorithm: string;
-  processes: Array<{
-    pid: string;
-    arrival_time: number;
-    burst_time: number;
-    appetite: number;
-  }>;
-  cores: Array<{ core_id: string; core_type: "P" | "E" }>;
-  time_quantum: number;
-}
-
-export interface ExecutionBlock {
-  processor_id: string;
-  pid: string | null;
-  start_time: number;
-  end_time: number;
-}
-
-export interface ProcessMetric {
-  pid: string;
-  at: number;
-  tt: number;
-  wt: number;
-  ntt: number;
-}
-
-export interface ScheduleResult {
-  timeline: ExecutionBlock[];
-  process_metrics: ProcessMetric[];
-  avg_wt: number;
-  avg_ntt: number;
-  total_energy: number;
-  max_time: number;
-}
-
-export interface SimResponse {
-  ok: boolean;
-  data: ScheduleResult | null;
-  error: { message: string } | null;
-}
-
 export async function runSimulation(req: SimRequest): Promise<SimResponse> {
   const py = await getPyodide();
   py.globals.set("__req_json", JSON.stringify(req));
   const out = py.runPython("__run_simulation(__req_json)") as string;
   return JSON.parse(out) as SimResponse;
 }
+
+export type { ExecutionBlock, ProcessMetric, ScheduleResult, SimRequest, SimResponse } from "./types";
