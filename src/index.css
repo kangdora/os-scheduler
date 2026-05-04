@@ -96,15 +96,43 @@ input, select {
 
 .layout-top {
   display: grid;
-  grid-template-columns: minmax(330px, 1.05fr) minmax(220px, 0.85fr) minmax(520px, 2.1fr);
+  grid-template-columns: minmax(550px, 1.6fr) minmax(700px, 2.5fr);
   gap: 14px;
   align-items: stretch;
   min-height: 0;
 }
 
+.combined-panel {
+  display: grid;
+  grid-template-columns: minmax(330px, 1fr) 1px minmax(180px, 0.4fr);
+  gap: 14px;
+  padding: 14px 16px;
+  overflow: hidden;
+}
+
+.combined-panel__divider {
+  background: var(--line);
+  width: 1px;
+  height: calc(100%);
+  
+}
+
+.algo-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.algo-panel__field select,
+.algo-panel__field input {
+  width: 85%;
+  box-sizing: border-box;
+}
+
 .layout-bottom {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(640px, 2.2fr);
+  grid-template-columns: minmax(400px, 1fr) minmax(600px, 1.8fr);
   gap: 14px;
   flex: 1 1 auto;
   min-height: 0;
@@ -152,7 +180,6 @@ input, select {
 .btn--big {
   padding: 10px 22px;
   font-size: 14px;
-  width: 100%;
   justify-content: center;
 }
 .btn--icon {
@@ -166,10 +193,17 @@ input, select {
 
 /* ===================== Process table ===================== */
 .proc-table-wrap {
-  max-height: 260px;
-  overflow: auto;
-  scrollbar-color: var(--line) transparent;
-  scrollbar-width: thin;
+  min-height: 380px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.proc-table-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+.proc-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 10px;
 }
 .proc-table {
   width: 100%;
@@ -270,25 +304,26 @@ input, select {
 }
 .algo-panel__buttons {
   display: flex;
-  gap: 6px;
+  flex-direction:column;
   margin-top: auto;
+  align-items: center;
 }
-.algo-panel__buttons .btn { flex: 1; }
+.algo-panel__buttons .btn { width: fit-content; min-width: 140px; }
 
 /* ===================== CPU box ===================== */
 .cpu-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 14px;
 }
 .cpu {
   border: 1.5px dashed var(--line);
-  border-radius: 16px;
-  padding: 10px;
+  border-radius: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: var(--card);
   position: relative;
 }
@@ -298,11 +333,11 @@ input, select {
 }
 .cpu__label {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
 }
 .cpu__wheel {
-  width: 96px;
-  height: 96px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   border: 5px solid var(--line);
   position: relative;
@@ -313,7 +348,7 @@ input, select {
 }
 .cpu__wheel-inner {
   position: absolute;
-  inset: 7px;
+  inset: 10px;
   border-radius: 50%;
   border: 2px dashed #d8c2a2;
   display: flex;
@@ -331,22 +366,22 @@ input, select {
 }
 .cpu__num {
   position: absolute;
-  bottom: -8px;
+  bottom: -12px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--card);
-  border: 1px solid var(--line);
+  border: 1.2px solid var(--line);
   border-radius: 999px;
-  padding: 0 8px;
-  font-size: 11px;
+  padding: 2px 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 .cpu__controls {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   align-items: center;
-  font-size: 11px;
-  margin-top: 6px;
+  font-size: 13px;
+  margin-top: 10px;
 }
 .cpu__process-name {
   min-height: 16px;
@@ -459,18 +494,15 @@ input, select {
   width: 100%;
   text-align: center;
 }
-.sleep__seed {
-  display: inline-block;
-  width: 6px;
-  height: 9px;
-  background: #5b3517;
-  border-radius: 50% 50% 30% 30%;
+.sleep__seed-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
   margin-left: 2px;
-  transform-origin: bottom center;
   animation: nibble 0.5s ease-in-out infinite alternate;
 }
 @keyframes nibble {
-  to { transform: scaleY(0.4); }
+  to { transform: scale(1.2) rotate(5deg); }
 }
 
 /* ===================== Result table ===================== */
@@ -695,6 +727,12 @@ input, select {
   width: 40%;
   background: var(--pink);
   animation: slide 1.2s ease-in-out infinite;
+}
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+imation: slide 1.2s ease-in-out infinite;
 }
 @keyframes slide {
   0% { transform: translateX(-100%); }

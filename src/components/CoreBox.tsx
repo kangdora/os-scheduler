@@ -2,8 +2,10 @@ import { CPU_COLORS, PROCESS_COLORS, READY_QUEUE_VISIBLE } from "../constants";
 import type { CoreUI, ProcessUI } from "../state";
 import type { SimState } from "./AlgorithmPanel";
 import Hamster from "./Hamster";
+import hamsterSeedImg from "../asset/HamsterSeed.png";
 
 interface CoreBoxProps {
+  // ... (rest of props)
   cores: CoreUI[];
   setCores: (next: CoreUI[]) => void;
   processes: ProcessUI[];
@@ -52,10 +54,13 @@ export default function CoreBox(props: CoreBoxProps) {
               >
                 <div className="cpu__wheel-bg" style={{ background: cpuColor.bg }} />
                 <div className="cpu__wheel-inner">
-                  {runningProc ? (
-                    <Hamster bg={wheelColor.bg} border={wheelColor.border} size={80} variant={isRunning ? "run" : "idle"} />
-                  ) : (
-                    <Hamster bg={cpuColor.bg} border={cpuColor.border} size={80} variant="idle" />
+                  {runningProc && (
+                    <Hamster
+                      bg={wheelColor.bg}
+                      border={wheelColor.border}
+                      size={120}
+                      variant={runningProc.appetite > 60 ? "fat" : "run"}
+                    />
                   )}
                 </div>
                 <span className="cpu__num">{idx + 1}</span>
@@ -104,7 +109,7 @@ export default function CoreBox(props: CoreBoxProps) {
                 <div key={i} className={`queue__cell ${proc ? "" : "queue__cell--empty"}`}>
                   {proc && color ? (
                     <>
-                      <Hamster bg={color.bg} border={color.border} size={28} />
+                      <Hamster bg={color.bg} border={color.border} size={24} />
                       <span className="pid-pill" style={{ background: color.pill }}>{proc.pid}</span>
                     </>
                   ) : null}
@@ -127,8 +132,8 @@ export default function CoreBox(props: CoreBoxProps) {
                 const color = PROCESS_COLORS[proc.colorIdx % PROCESS_COLORS.length];
                 return (
                   <span key={pid} style={{ display: "inline-flex", alignItems: "center" }}>
-                    <Hamster bg={color.bg} border={color.border} size={32} variant="sleep" />
-                    <span className="sleep__seed" />
+                    <Hamster bg={color.bg} border={color.border} size={26} variant="sleep" />
+                    <img src={hamsterSeedImg} alt="seed" className="sleep__seed-img" />
                   </span>
                 );
               })
@@ -139,3 +144,4 @@ export default function CoreBox(props: CoreBoxProps) {
     </section>
   );
 }
+
