@@ -1,11 +1,11 @@
-import { CPU_COLORS, PROCESS_COLORS, READY_QUEUE_VISIBLE } from "../constants";
+import { CPU_COLORS, PROCESS_COLORS, READY_QUEUE_VISIBLE, type AlgorithmId } from "../constants";
 import type { CoreUI, ProcessUI } from "../state";
 import type { SimState } from "./AlgorithmPanel";
 import Hamster from "./Hamster";
 import hamsterSeedImg from "../asset/HamsterSeed.png";
 
 interface CoreBoxProps {
-  // ... (rest of props)
+  algorithm: AlgorithmId;
   cores: CoreUI[];
   setCores: (next: CoreUI[]) => void;
   processes: ProcessUI[];
@@ -17,7 +17,7 @@ interface CoreBoxProps {
 }
 
 export default function CoreBox(props: CoreBoxProps) {
-  const { cores, setCores, processes, runningByCore, readyPids, sleepPids, simState, disabled } = props;
+  const { algorithm, cores, setCores, processes, runningByCore, readyPids, sleepPids, simState, disabled } = props;
 
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
 
@@ -109,7 +109,12 @@ export default function CoreBox(props: CoreBoxProps) {
                 <div key={i} className={`queue__cell ${proc ? "" : "queue__cell--empty"}`}>
                   {proc && color ? (
                     <>
-                      <Hamster bg={color.bg} border={color.border} size={24} />
+                      <Hamster
+                        bg={color.bg}
+                        border={color.border}
+                        size={24}
+                        variant={algorithm === "diet" ? "diet-ready" : "idle"}
+                      />
                       <span className="pid-pill" style={{ background: color.pill }}>{proc.pid}</span>
                     </>
                   ) : null}
@@ -132,8 +137,13 @@ export default function CoreBox(props: CoreBoxProps) {
                 const color = PROCESS_COLORS[proc.colorIdx % PROCESS_COLORS.length];
                 return (
                   <span key={pid} style={{ display: "inline-flex", alignItems: "center" }}>
-                    <Hamster bg={color.bg} border={color.border} size={26} variant="sleep" />
-                    <img src={hamsterSeedImg} alt="seed" className="sleep__seed-img" />
+                    <Hamster 
+                      bg={color.bg} 
+                      border={color.border} 
+                      size={26} 
+                      variant={algorithm === "diet" ? "diet-sleep" : "sleep"} 
+                    />
+                    {algorithm !== "diet" && <img src={hamsterSeedImg} alt="seed" className="sleep__seed-img" />}
                   </span>
                 );
               })
