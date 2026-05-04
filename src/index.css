@@ -543,7 +543,7 @@ input, select {
   color: #8a6d1d;
 }
 .result-table-wrap {
-  max-height: 320px;
+  max-height: 280px;
   overflow: auto;
   scrollbar-color: var(--line) transparent;
   scrollbar-width: thin;
@@ -570,7 +570,17 @@ input, select {
   border-collapse: separate;
   border-spacing: 0 5px;
   font-size: 13px;
+  table-layout: fixed;
 }
+.result-table th:nth-child(1), .result-table td:nth-child(1) { width: 50px; }
+.result-table th:nth-child(2), .result-table td:nth-child(2) { width: auto; }
+.result-table th:nth-child(3), .result-table td:nth-child(3) { width: 45px; }
+.result-table th:nth-child(4), .result-table td:nth-child(4) { width: 45px; }
+.result-table th:nth-child(5), .result-table td:nth-child(5) { width: 45px; }
+.result-table th:nth-child(6), .result-table td:nth-child(6) { width: 45px; }
+.result-table th:nth-child(7), .result-table td:nth-child(7) { width: 50px; }
+.result-table th:nth-child(8), .result-table td:nth-child(8) { width: 85px; }
+
 .result-table th {
   font-size: 12px;
   font-weight: 600;
