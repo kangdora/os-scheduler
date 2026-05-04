@@ -3,7 +3,16 @@ import heapq
 import random
 
 from simulator.core_spec import CORE_SPECS
-from simulator.models import Core, DietProcess, ExecutionBlock, ProcessMetric, ProcessorRuntime, ScheduleResult
+from simulator.models import (
+    Core,
+    DietProcess,
+    ExecutionBlock,
+    ProcessMetric,
+    ProcessorRuntime,
+    ReadyQueuePriority,
+    ReadyQueuePrioritySnapshot,
+    ScheduleResult,
+)
 
 
 class DIET:
@@ -303,11 +312,34 @@ class DIET:
 
         self._rebuild_ready_queue(ready_queue)
 
+    def _record_ready_queue_priorities(
+            self,
+            ready_queue_priorities: list[ReadyQueuePrioritySnapshot],
+            ready_queue: list[tuple[float, str, DietProcess]],
+            time: int,
+    ) -> None:
+        ready_processes = sorted((item[2] for item in ready_queue), key=lambda p: (-self._score(p), p.pid))
+        ready_queue_priorities.append(
+            ReadyQueuePrioritySnapshot(
+                time=time,
+                items=[
+                    ReadyQueuePriority(
+                        pid=process.pid,
+                        priority=process.priority,
+                        enter_bonus=process.enter_bonus,
+                        score=self._score(process),
+                    )
+                    for process in ready_processes
+                ],
+            )
+        )
+
     def _build_result(
             self,
             processes: list[DietProcess],
             timeline: list[ExecutionBlock],
             completion_time: dict[str, int],
+            ready_queue_priorities: list[ReadyQueuePrioritySnapshot],
     ) -> ScheduleResult:
         """FCFS와 같은 방식으로 TT/WT/NTT 메트릭과 결과를 만든다."""
         service_ticks: dict[str, int] = {}
@@ -340,6 +372,7 @@ class DIET:
             avg_ntt=avg_ntt,
             total_energy=self.total_energy,
             max_time=self.max_time,
+            ready_queue_priorities=ready_queue_priorities,
         )
 
     def run(self, processes: list[DietProcess], cores: list[Core]) -> ScheduleResult:
@@ -359,6 +392,7 @@ class DIET:
 
         time = 0
         self.total_energy = 0.0
+        ready_queue_priorities: list[ReadyQueuePrioritySnapshot] = []
 
         while True:
             has_running_core = self._has_running_core(priority_cores, runtime)
@@ -367,6 +401,7 @@ class DIET:
 
             self._move_arrived(remain_queue, ready_queue, eating_queue, time)
             self._assign_to_cores(priority_cores, runtime, ready_queue, timeline, remaining_work, running_process, time)
+            self._record_ready_queue_priorities(ready_queue_priorities, ready_queue, time)
             self._tick_execute(
                 priority_cores,
                 runtime,
@@ -381,4 +416,4 @@ class DIET:
             time += 1
 
         self.max_time = time
-        return self._build_result(processes, timeline, completion_time)
+        return self._build_result(processes, timeline, completion_time, ready_queue_priorities)

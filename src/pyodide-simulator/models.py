@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 @dataclass
@@ -40,6 +40,20 @@ class ProcessMetric:
 
 
 @dataclass
+class ReadyQueuePriority:
+    pid: str
+    priority: float
+    enter_bonus: float
+    score: float
+
+
+@dataclass
+class ReadyQueuePrioritySnapshot:
+    time: int
+    items: list[ReadyQueuePriority]
+
+
+@dataclass
 class ScheduleResult:
     timeline: list[ExecutionBlock]
     process_metrics: list[ProcessMetric]
@@ -47,6 +61,7 @@ class ScheduleResult:
     avg_ntt: float
     total_energy: float
     max_time: int
+    ready_queue_priorities: list[ReadyQueuePrioritySnapshot] = field(default_factory=list)
 
 
 @dataclass

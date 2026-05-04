@@ -71,6 +71,18 @@ export interface ProcessMetric {
   ntt: number;
 }
 
+export interface ReadyQueuePriority {
+  pid: string;
+  priority: number;
+  enter_bonus: number;
+  score: number;
+}
+
+export interface ReadyQueuePrioritySnapshot {
+  time: number;
+  items: ReadyQueuePriority[];
+}
+
 export interface ScheduleResult {
   timeline: ExecutionBlock[];
   process_metrics: ProcessMetric[];
@@ -78,6 +90,7 @@ export interface ScheduleResult {
   avg_ntt: number;
   total_energy: number;
   max_time: number;
+  ready_queue_priorities: ReadyQueuePrioritySnapshot[];
 }
 
 export interface SimResponse {
