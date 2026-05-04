@@ -11,7 +11,7 @@ class HRRN:
 
     def _init_runtime(self, processes: list[Process], cores: list[Core]):
         remain_queue = deque(sorted(processes, key=lambda p: (p.arrival_time, p.pid)))
-        ready_queue: list[Process] = []
+        ready_queue: deque[Process] = deque()
         timeline: list[ExecutionBlock] = []
         completion_time: dict[str, int] = {}
 
@@ -33,7 +33,7 @@ class HRRN:
     def _has_running_core(self, priority_cores: list[Core], runtime: dict) -> bool:
         return any(runtime[c.core_id].current_process is not None for c in priority_cores)
 
-    def _move_arrived(self, remain_queue: deque, ready_queue: list[Process], time: int) -> None:
+    def _move_arrived(self, remain_queue: deque, ready_queue: deque, time: int) -> None:
         while remain_queue and remain_queue[0].arrival_time <= time:
             ready_queue.append(remain_queue.popleft())
 
@@ -41,7 +41,7 @@ class HRRN:
         self,
         priority_cores: list[Core],
         runtime: dict,
-        ready_queue: list[Process],
+        ready_queue: deque,
         time: int,
     ) -> None:
         for core in priority_cores:
@@ -53,9 +53,8 @@ class HRRN:
                     waiting_time = time - p.arrival_time
                     return (waiting_time + p.burst_time) / p.burst_time
 
-                ready_queue.sort(key=lambda p: response_ratio(p), reverse=True)
-
-                process = ready_queue.pop(0)
+                process = max(ready_queue, key=response_ratio)
+                ready_queue.remove(process)
 
                 core_runtime.current_process = process
                 core_runtime.remaining_work = process.burst_time
