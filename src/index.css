@@ -629,8 +629,7 @@ input, select {
   margin-bottom: 6px;
 }
 .gantt__time-row span {
-  justify-self: end;
-  transform: translateX(50%);
+  justify-self: start;
   line-height: 1;
 }
 .gantt__row {
