@@ -21,15 +21,28 @@ export function deriveAtTick(
   const completedPids = new Set<string>();
   const statusByPid = new Map<string, ProcStatus>();
 
+  // 각 프로세스별로 '진짜 마지막 종료 시각'을 먼저 구합니다.
+  const lastEndTimeByPid = new Map<string, number>();
   for (const b of timeline) {
     if (!b.pid) continue;
+    const currentMax = lastEndTimeByPid.get(b.pid) ?? 0;
+    if (b.end_time > currentMax) {
+      lastEndTimeByPid.set(b.pid, b.end_time)
+    }
+    // 현제 실행 중인 코어 확인
     if (b.start_time <= tick && tick < b.end_time) {
       runningByCore.set(b.processor_id, b.pid);
     }
-    if (b.end_time <= tick) completedPids.add(b.pid);
   }
 
   const runningPids = new Set(runningByCore.values());
+
+  // 진짜 마지막 종료 시각이 현재 tick보다 작거나 같을 때만 완료로 간주
+  for (const [pid, lastEnd] of lastEndTimeByPid) {
+    if (lastEnd <= tick) {
+      completedPids.add(pid);
+    }
+  }
 
   const arrived = processes.filter((p) => p.arrivalTime <= tick);
   const ready = arrived
