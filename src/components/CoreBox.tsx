@@ -138,3 +138,4 @@ export default function CoreBox(props: CoreBoxProps) {
     </section>
   );
 }
+

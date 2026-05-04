@@ -33,8 +33,8 @@ export default function Hamster({ bg, border, size = 36, variant = "idle" }: Ham
         src={imgSrc}
         alt=""
         style={{
-          width: "145%",
-          height: "145%",
+          width: "120%",
+          height: "120%",
           objectFit: "contain",
         }}
       />
