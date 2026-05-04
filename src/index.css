@@ -319,11 +319,11 @@ input, select {
 .cpu {
   border: 1.5px dashed var(--line);
   border-radius: 20px;
-  padding: 18px;
+  padding: 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   background: var(--card);
   position: relative;
 }
@@ -449,8 +449,9 @@ input, select {
   align-items: center;
 }
 .queue__cell {
-  width: 52px;
-  height: 56px;
+  width: 64px;
+  height: 72px;
+
   border-radius: 12px;
   background: #fff;
   border: 1px solid var(--line);
@@ -485,7 +486,7 @@ input, select {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  min-height: 56px;
+  min-height: 72px;
   align-items: center;
 }
 .sleep__empty {

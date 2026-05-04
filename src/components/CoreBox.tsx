@@ -112,7 +112,7 @@ export default function CoreBox(props: CoreBoxProps) {
                       <Hamster
                         bg={color.bg}
                         border={color.border}
-                        size={24}
+                        size={32}
                         variant={algorithm === "diet" ? "diet-ready" : "idle"}
                       />
                       <span className="pid-pill" style={{ background: color.pill }}>{proc.pid}</span>
@@ -140,7 +140,7 @@ export default function CoreBox(props: CoreBoxProps) {
                     <Hamster 
                       bg={color.bg} 
                       border={color.border} 
-                      size={26} 
+                      size={34} 
                       variant={algorithm === "diet" ? "diet-sleep" : "sleep"} 
                     />
                     {algorithm !== "diet" && <img src={hamsterSeedImg} alt="seed" className="sleep__seed-img" />}
