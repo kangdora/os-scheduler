@@ -1,16 +1,19 @@
 import hamsterImg from '../asset/Hamster.png';
 import hamsterEatImg from '../asset/HamsterEat.png';
+import hamsterFatImg from '../asset/HamsterFat.png';
 
 interface HamsterProps {
   bg: string;
   border: string;
   size?: number;
-  variant?: "idle" | "run" | "sleep";
+  variant?: "idle" | "run" | "sleep" | "fat";
 }
 
-export default function Hamster({ bg, border, size = 36, variant = "idle" }: HamsterProps) {
+export default function Hamster({ bg, border, size = 28, variant = "idle" }: HamsterProps) {
   const className = `hamster hamster--${variant}`;
-  const imgSrc = variant === "sleep" ? hamsterEatImg : hamsterImg;
+  let imgSrc = hamsterImg;
+  if (variant === "sleep") imgSrc = hamsterEatImg;
+  else if (variant === "fat") imgSrc = hamsterFatImg;
 
   return (
     <div
