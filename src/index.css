@@ -468,18 +468,15 @@ input, select {
   width: 100%;
   text-align: center;
 }
-.sleep__seed {
-  display: inline-block;
-  width: 6px;
-  height: 9px;
-  background: #5b3517;
-  border-radius: 50% 50% 30% 30%;
+.sleep__seed-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
   margin-left: 2px;
-  transform-origin: bottom center;
   animation: nibble 0.5s ease-in-out infinite alternate;
 }
 @keyframes nibble {
-  to { transform: scaleY(0.4); }
+  to { transform: scale(1.2) rotate(5deg); }
 }
 
 /* ===================== Result table ===================== */
@@ -664,6 +661,12 @@ input, select {
   width: 40%;
   background: var(--pink);
   animation: slide 1.2s ease-in-out infinite;
+}
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+imation: slide 1.2s ease-in-out infinite;
 }
 @keyframes slide {
   0% { transform: translateX(-100%); }

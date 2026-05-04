@@ -51,15 +51,13 @@ export default function CoreBox(props: CoreBoxProps) {
               >
                 <div className="cpu__wheel-bg" style={{ background: cpuColor.bg }} />
                 <div className="cpu__wheel-inner">
-                  {runningProc ? (
+                  {runningProc && (
                     <Hamster
                       bg={wheelColor.bg}
                       border={wheelColor.border}
                       size={120}
                       variant={runningProc.appetite > 70 ? "fat" : "run"}
                     />
-                  ) : (
-                    <Hamster bg={cpuColor.bg} border={cpuColor.border} size={120} variant="idle" />
                   )}
                 </div>
                 <span className="cpu__num">{idx + 1}</span>
