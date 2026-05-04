@@ -183,8 +183,8 @@ input, select {
 
 /* ===================== Process table ===================== */
 .proc-table-wrap {
-  min-height: 480px;
-  max-height: 480px;
+  min-height: 380px;
+  max-height: 380px;
   overflow-y: auto;
   padding-right: 4px;
 }
