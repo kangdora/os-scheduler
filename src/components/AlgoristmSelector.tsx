@@ -1,13 +1,13 @@
-import type { AlgorithmKey } from "../types";
+import type { AlgorithmId } from "../constants";
 
 type AlgorithmSelectorProps = {
-  algorithm: AlgorithmKey;
+  algorithm: AlgorithmId;
   timeQuantum: number;
-  onAlgorithmChange: (algorithm: AlgorithmKey) => void;
+  onAlgorithmChange: (algorithm: AlgorithmId) => void;
   onTimeQuantumChange: (value: number) => void;
 };
 
-const algorithmOptions: Array<{ value: AlgorithmKey; label: string }> = [
+const algorithmOptions: Array<{ value: AlgorithmId; label: string }> = [
   { value: "fcfs", label: "FCFS" },
   { value: "rr", label: "RR" },
   { value: "hrrn", label: "HRRN" },

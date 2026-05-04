@@ -8,7 +8,7 @@ import GanttChart from "./components/GanttChart";
 import Modal from "./components/Modal";
 import { defaultCores, defaultProcesses, type CoreUI, type ProcessUI } from "./state";
 import { type AlgorithmId } from "./constants";
-import { getPyodide, runSimulation, type ScheduleResult } from "./pyodide";
+import { getPyodide, runSimulation, type ScheduleResult, type SimRequest } from "./pyodide";
 import { deriveAtTick, useSimulationPlayback } from "./useSimulation";
 
 export default function App() {
@@ -54,17 +54,30 @@ export default function App() {
 
     setRunning(true);
     try {
-      const res = await runSimulation({
-        algorithm,
-        processes: processes.map((p) => ({
-          pid: p.pid,
-          arrival_time: p.arrivalTime,
-          burst_time: p.burstTime,
-          appetite: p.appetite,
-        })),
-        cores: enabledCores.map((c) => ({ core_id: c.coreId, core_type: c.coreType })),
-        time_quantum: timeQuantum,
-      });
+      const coresForRequest = enabledCores.map((c) => ({ core_id: c.coreId, core_type: c.coreType }));
+      const request: SimRequest = algorithm === "diet"
+        ? {
+            algorithm,
+            processes: processes.map((p) => ({
+              pid: p.pid,
+              arrival_time: p.arrivalTime,
+              burst_time: p.burstTime,
+              appetite: p.appetite,
+            })),
+            cores: coresForRequest,
+            time_quantum: null,
+          }
+        : {
+            algorithm,
+            processes: processes.map((p) => ({
+              pid: p.pid,
+              arrival_time: p.arrivalTime,
+              burst_time: p.burstTime,
+            })),
+            cores: coresForRequest,
+            time_quantum: algorithm === "rr" ? timeQuantum : null,
+          };
+      const res = await runSimulation(request);
       if (!res.ok || !res.data) {
         setRunError(res.error?.message ?? "알 수 없는 오류");
         return;
@@ -143,6 +156,7 @@ export default function App() {
           runningByCore={derived.runningByCore}
           readyPids={derived.readyPids}
           sleepPids={derived.sleepPids}
+          simState={playback.simState}
           disabled={editsLocked}
         />
       </div>

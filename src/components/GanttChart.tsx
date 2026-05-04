@@ -24,7 +24,7 @@ export default function GanttChart({
 }: GanttChartProps) {
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
   const ticks = Math.max(maxTime, 1);
-  const cellPx = expanded ? 48 : 36;
+  const cellPx = expanded ? 58 : 43;
   const tickGridTemplate = `repeat(${ticks}, ${cellPx}px)`;
 
   const blocksByCore = new Map<string, ExecutionBlock[]>();
@@ -107,7 +107,7 @@ export default function GanttChart({
                         }}
                         title={`${proc.pid} ${proc.name} (${b.start_time}-${b.end_time})`}
                       >
-                        {width >= 36 && (
+                        {width >= 43 && (
                           <Hamster bg={color.bg} border={color.border} size={20} />
                         )}
                         <span>{proc.pid}</span>

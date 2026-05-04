@@ -24,6 +24,7 @@ body {
   color: var(--text);
   font-size: 14px;
   line-height: 1.45;
+  overflow: hidden;
 }
 
 button {
@@ -38,13 +39,14 @@ input, select {
 }
 
 .app {
-  min-height: 100vh;
+  height: 100vh;
   padding: 18px 22px 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
   max-width: 1600px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .header {
@@ -97,6 +99,7 @@ input, select {
   grid-template-columns: minmax(550px, 1.6fr) minmax(700px, 2.5fr);
   gap: 14px;
   align-items: stretch;
+  min-height: 0;
 }
 
 .combined-panel {
@@ -131,6 +134,13 @@ input, select {
   display: grid;
   grid-template-columns: minmax(400px, 1fr) minmax(600px, 1.8fr);
   gap: 14px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.layout-top > .card,
+.layout-bottom > .card {
+  min-height: 0;
 }
 
 @media (max-width: 1100px) {
@@ -251,6 +261,15 @@ input, select {
 }
 .cell-input--narrow { width: 52px; }
 .cell-input--name { width: 80px; }
+.cell-input--narrow[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.cell-input--narrow[type="number"]::-webkit-outer-spin-button,
+.cell-input--narrow[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .row-actions {
   display: flex;
   justify-content: flex-end;
@@ -363,6 +382,13 @@ input, select {
   align-items: center;
   font-size: 13px;
   margin-top: 10px;
+}
+.cpu__process-name {
+  min-height: 16px;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 16px;
 }
 .toggle {
   display: inline-flex;
@@ -501,6 +527,25 @@ input, select {
 .result-table-wrap {
   max-height: 320px;
   overflow: auto;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
+}
+.proc-table-wrap::-webkit-scrollbar,
+.result-table-wrap::-webkit-scrollbar,
+.gantt-wrap::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.proc-table-wrap::-webkit-scrollbar-track,
+.result-table-wrap::-webkit-scrollbar-track,
+.gantt-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.proc-table-wrap::-webkit-scrollbar-thumb,
+.result-table-wrap::-webkit-scrollbar-thumb,
+.gantt-wrap::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
 }
 .result-table {
   width: 100%;
@@ -530,15 +575,18 @@ input, select {
 }
 .status--waiting { background: #fff3b8; border-color: #f1d96b; color: #8a6d1d; }
 .status--running { background: #cfe3f9; border-color: #85b4ec; color: #2e5a93; }
+.status--sleep   { background: #f6dfc1; border-color: #dfb481; color: #805c2c; }
 .status--done    { background: #c7ecd0; border-color: #86c99e; color: #3f7457; }
 
 /* ===================== Gantt chart ===================== */
 .gantt-wrap {
   overflow-x: auto;
   padding-bottom: 6px;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
 }
 .gantt {
-  --cell: 36px;
+  --cell: 43px;
   display: grid;
   grid-template-columns: 60px 1fr;
   gap: 8px;
@@ -550,11 +598,12 @@ input, select {
   font-size: 11px;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .gantt__time-row span {
-  text-align: center;
-  border-left: 1px dashed transparent;
+  justify-self: end;
+  transform: translateX(50%);
+  line-height: 1;
 }
 .gantt__row {
   display: contents;
@@ -571,7 +620,7 @@ input, select {
 }
 .gantt__track {
   position: relative;
-  height: 30px;
+  height: 42px;
   display: grid;
   background-image:
     linear-gradient(to right, var(--line) 1px, transparent 1px);
@@ -579,16 +628,16 @@ input, select {
 }
 .gantt__block {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
+  top: 4px;
+  bottom: 4px;
   border-radius: 8px;
   border: 1px solid;
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 0 6px;
+  padding: 0 2px;
   font-weight: 700;
-  font-size: 11.5px;
+  font-size: 9.5px;
   overflow: hidden;
   white-space: nowrap;
   transition: width 0.2s ease;
@@ -624,9 +673,26 @@ input, select {
 .modal__title { font-weight: 700; font-size: 17px; }
 
 /* ===================== Hamster animations ===================== */
-.hamster--run { animation: bob 0.45s ease-in-out infinite alternate; }
+.hamster {
+  display: block;
+  flex: 0 0 auto;
+}
+.hamster--run {
+  object-fit: cover;
+  object-position: center bottom;
+  transform-origin: center center;
+  animation: wheel-run-tilt 0.5s step-end infinite;
+}
+.hamster--idle {
+  object-fit: cover;
+  object-position: center bottom;
+}
 .hamster--sleep { animation: chew 0.45s ease-in-out infinite alternate; }
 @keyframes bob { to { transform: translateY(-2px); } }
+@keyframes wheel-run-tilt {
+  0%, 49.999% { transform: rotate(20deg); }
+  50%, 100% { transform: rotate(-20deg); }
+}
 @keyframes chew { to { transform: rotate(-3deg); } }
 
 /* ===================== Splash ===================== */
