@@ -8,7 +8,7 @@ import GanttChart from "./components/GanttChart";
 import Modal from "./components/Modal";
 import { defaultCores, defaultProcesses, type CoreUI, type ProcessUI } from "./state";
 import { type AlgorithmId } from "./constants";
-import { getPyodide, runSimulation, type ScheduleResult } from "./pyodide";
+import { getPyodide, runSimulation, type ScheduleResult, type SimRequest } from "./pyodide";
 import { deriveAtTick, useSimulationPlayback } from "./useSimulation";
 
 export default function App() {
@@ -54,17 +54,30 @@ export default function App() {
 
     setRunning(true);
     try {
-      const res = await runSimulation({
-        algorithm,
-        processes: processes.map((p) => ({
-          pid: p.pid,
-          arrival_time: p.arrivalTime,
-          burst_time: p.burstTime,
-          appetite: p.appetite,
-        })),
-        cores: enabledCores.map((c) => ({ core_id: c.coreId, core_type: c.coreType })),
-        time_quantum: timeQuantum,
-      });
+      const coresForRequest = enabledCores.map((c) => ({ core_id: c.coreId, core_type: c.coreType }));
+      const request: SimRequest = algorithm === "diet"
+        ? {
+            algorithm,
+            processes: processes.map((p) => ({
+              pid: p.pid,
+              arrival_time: p.arrivalTime,
+              burst_time: p.burstTime,
+              appetite: p.appetite,
+            })),
+            cores: coresForRequest,
+            time_quantum: null,
+          }
+        : {
+            algorithm,
+            processes: processes.map((p) => ({
+              pid: p.pid,
+              arrival_time: p.arrivalTime,
+              burst_time: p.burstTime,
+            })),
+            cores: coresForRequest,
+            time_quantum: algorithm === "rr" ? timeQuantum : null,
+          };
+      const res = await runSimulation(request);
       if (!res.ok || !res.data) {
         setRunError(res.error?.message ?? "알 수 없는 오류");
         return;
@@ -89,10 +102,16 @@ export default function App() {
     () => deriveAtTick(playback.tick, processes, result?.timeline ?? [], finished),
     [playback.tick, processes, result, finished],
   );
+  const readySnapshot = useMemo(() => {
+    if (algorithm !== "diet") return null;
+    return result?.ready_queue_priorities.find((snapshot) => snapshot.time === playback.tick) ?? null;
+  }, [algorithm, result, playback.tick]);
 
   const energy = result?.total_energy ?? 0;
   const metrics = result?.process_metrics ?? [];
   const maxTime = result?.max_time ?? 0;
+  const readyPids = readySnapshot ? readySnapshot.items.map((item) => item.pid) : derived.readyPids;
+  const readyPriorityByPid = new Map(readySnapshot?.items.map((item) => [item.pid, item.priority]) ?? []);
 
   if (!pyodideReady) {
     return (
@@ -113,33 +132,39 @@ export default function App() {
       <Header />
 
       <div className="layout-top">
-        <ProcessBox
-          processes={processes}
-          setProcesses={setProcesses}
-          disabled={editsLocked}
-          showAppetite={algorithm === "diet"}
-        />
-        <AlgorithmPanel
-          algorithm={algorithm}
-          setAlgorithm={setAlgorithm}
-          timeQuantum={timeQuantum}
-          setTimeQuantum={setTimeQuantum}
-          interval={interval}
-          setInterval={setInterval}
-          simState={playback.simState}
-          loading={running}
-          onStart={onStart}
-          onPause={playback.pause}
-          onResume={playback.resume}
-          onReset={onReset}
-        />
+        <div className="card combined-panel">
+          <ProcessBox
+            processes={processes}
+            setProcesses={setProcesses}
+            disabled={editsLocked}
+            showAppetite={algorithm === "diet"}
+          />
+          <div className="combined-panel__divider" />
+          <AlgorithmPanel
+            algorithm={algorithm}
+            setAlgorithm={setAlgorithm}
+            timeQuantum={timeQuantum}
+            setTimeQuantum={setTimeQuantum}
+            interval={interval}
+            setInterval={setInterval}
+            simState={playback.simState}
+            loading={running}
+            onStart={onStart}
+            onPause={playback.pause}
+            onResume={playback.resume}
+            onReset={onReset}
+          />
+        </div>
         <CoreBox
+          algorithm={algorithm}
           cores={cores}
           setCores={setCores}
           processes={processes}
           runningByCore={derived.runningByCore}
-          readyPids={derived.readyPids}
+          readyPids={readyPids}
+          readyPriorityByPid={readyPriorityByPid}
           sleepPids={derived.sleepPids}
+          simState={playback.simState}
           disabled={editsLocked}
         />
       </div>

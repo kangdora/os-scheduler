@@ -24,6 +24,7 @@ body {
   color: var(--text);
   font-size: 14px;
   line-height: 1.45;
+  overflow: hidden;
 }
 
 button {
@@ -38,13 +39,14 @@ input, select {
 }
 
 .app {
-  min-height: 100vh;
+  height: 100vh;
   padding: 18px 22px 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
   max-width: 1600px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .header {
@@ -94,15 +96,59 @@ input, select {
 
 .layout-top {
   display: grid;
-  grid-template-columns: minmax(330px, 1.05fr) minmax(220px, 0.85fr) minmax(520px, 2.1fr);
+  grid-template-columns: minmax(550px, 1.6fr) minmax(700px, 2.5fr);
   gap: 14px;
   align-items: stretch;
+  min-height: 0;
+  flex: 0 0 auto;
+}
+
+.combined-panel {
+  display: grid;
+  grid-template-columns: minmax(330px, 1fr) 1px minmax(180px, 0.4fr);
+  gap: 14px;
+  padding: 14px 16px;
+  overflow: hidden;
+  min-height: 480px;
+}
+
+.combined-panel__divider {
+  background: var(--line);
+  width: 1px;
+  height: calc(100%);
+  
+}
+
+.process-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.algo-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.algo-panel__field select,
+.algo-panel__field input {
+  width: 85%;
+  box-sizing: border-box;
 }
 
 .layout-bottom {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(640px, 2.2fr);
+  grid-template-columns: minmax(400px, 1fr) minmax(600px, 1.8fr);
   gap: 14px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.layout-top > .card,
+.layout-bottom > .card {
+  min-height: 0;
 }
 
 @media (max-width: 1100px) {
@@ -142,7 +188,6 @@ input, select {
 .btn--big {
   padding: 10px 22px;
   font-size: 14px;
-  width: 100%;
   justify-content: center;
 }
 .btn--icon {
@@ -156,17 +201,34 @@ input, select {
 
 /* ===================== Process table ===================== */
 .proc-table-wrap {
-  max-height: none;
-  overflow: visible;
+  min-height: 380px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.proc-table-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+.proc-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 10px;
 }
 .proc-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 3px;
   font-size: 12.5px;
+  table-layout: fixed;
 }
+.proc-table th:nth-child(1), .proc-table td:nth-child(1) { width: 50px; }
+.proc-table th:nth-child(2), .proc-table td:nth-child(2) { width: auto; }
+.proc-table th:nth-child(3), .proc-table td:nth-child(3) { width: 60px; }
+.proc-table th:nth-child(4), .proc-table td:nth-child(4) { width: 60px; }
+.proc-table th:nth-child(5), .proc-table td:nth-child(5) { width: 60px; }
+.proc-table th:nth-child(6), .proc-table td:nth-child(6) { width: 40px; }
+
 .proc-table th {
-  text-align: left;
+  text-align: center;
   font-weight: 600;
   color: var(--muted);
   font-size: 12px;
@@ -215,6 +277,15 @@ input, select {
 }
 .cell-input--narrow { width: 52px; }
 .cell-input--name { width: 80px; }
+.cell-input--narrow[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.cell-input--narrow[type="number"]::-webkit-outer-spin-button,
+.cell-input--narrow[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .row-actions {
   display: flex;
   justify-content: flex-end;
@@ -249,25 +320,27 @@ input, select {
 }
 .algo-panel__buttons {
   display: flex;
-  gap: 6px;
+  flex-direction: column;
   margin-top: auto;
+  align-items: center;
+  gap: 10px;
 }
-.algo-panel__buttons .btn { flex: 1; }
+.algo-panel__buttons .btn { width: fit-content; min-width: 140px; }
 
 /* ===================== CPU box ===================== */
 .cpu-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 14px;
 }
 .cpu {
   border: 1.5px dashed var(--line);
-  border-radius: 16px;
-  padding: 10px;
+  border-radius: 20px;
+  padding: 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
   background: var(--card);
   position: relative;
 }
@@ -277,13 +350,13 @@ input, select {
 }
 .cpu__label {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
 }
 .cpu__wheel {
-  width: 76px;
-  height: 76px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  border: 4px solid var(--line);
+  border: 5px solid var(--line);
   position: relative;
   display: flex;
   align-items: center;
@@ -292,7 +365,7 @@ input, select {
 }
 .cpu__wheel-inner {
   position: absolute;
-  inset: 6px;
+  inset: 10px;
   border-radius: 50%;
   border: 2px dashed #d8c2a2;
   display: flex;
@@ -310,22 +383,29 @@ input, select {
 }
 .cpu__num {
   position: absolute;
-  bottom: -8px;
+  bottom: -12px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--card);
-  border: 1px solid var(--line);
+  border: 1.2px solid var(--line);
   border-radius: 999px;
-  padding: 0 8px;
-  font-size: 11px;
+  padding: 2px 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 .cpu__controls {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   align-items: center;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.cpu__process-name {
+  min-height: 16px;
+  margin-top: 2px;
+  color: var(--muted);
   font-size: 11px;
-  margin-top: 6px;
+  line-height: 16px;
 }
 .toggle {
   display: inline-flex;
@@ -386,8 +466,9 @@ input, select {
   align-items: center;
 }
 .queue__cell {
-  width: 52px;
-  height: 56px;
+  width: 64px;
+  height: 72px;
+
   border-radius: 12px;
   background: #fff;
   border: 1px solid var(--line);
@@ -422,7 +503,7 @@ input, select {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  min-height: 56px;
+  min-height: 72px;
   align-items: center;
 }
 .sleep__empty {
@@ -431,22 +512,27 @@ input, select {
   width: 100%;
   text-align: center;
 }
-.sleep__seed {
-  display: inline-block;
-  width: 6px;
-  height: 9px;
-  background: #5b3517;
-  border-radius: 50% 50% 30% 30%;
+.sleep__seed-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
   margin-left: 2px;
-  transform-origin: bottom center;
   animation: nibble 0.5s ease-in-out infinite alternate;
 }
 @keyframes nibble {
-  to { transform: scaleY(0.4); }
+  to { transform: scale(1.2) rotate(5deg); }
 }
 
 /* ===================== Result table ===================== */
+.result-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
 .result-head {
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -465,15 +551,46 @@ input, select {
   color: #8a6d1d;
 }
 .result-table-wrap {
-  max-height: 320px;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 280px;
   overflow: auto;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
+}
+.proc-table-wrap::-webkit-scrollbar,
+.result-table-wrap::-webkit-scrollbar,
+.gantt-wrap::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.proc-table-wrap::-webkit-scrollbar-track,
+.result-table-wrap::-webkit-scrollbar-track,
+.gantt-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.proc-table-wrap::-webkit-scrollbar-thumb,
+.result-table-wrap::-webkit-scrollbar-thumb,
+.gantt-wrap::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
 }
 .result-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 5px;
   font-size: 13px;
+  table-layout: fixed;
 }
+.result-table th:nth-child(1), .result-table td:nth-child(1) { width: 50px; }
+.result-table th:nth-child(2), .result-table td:nth-child(2) { width: auto; }
+.result-table th:nth-child(3), .result-table td:nth-child(3) { width: 45px; }
+.result-table th:nth-child(4), .result-table td:nth-child(4) { width: 45px; }
+.result-table th:nth-child(5), .result-table td:nth-child(5) { width: 45px; }
+.result-table th:nth-child(6), .result-table td:nth-child(6) { width: 45px; }
+.result-table th:nth-child(7), .result-table td:nth-child(7) { width: 50px; }
+.result-table th:nth-child(8), .result-table td:nth-child(8) { width: 85px; }
+
 .result-table th {
   font-size: 12px;
   font-weight: 600;
@@ -496,15 +613,18 @@ input, select {
 }
 .status--waiting { background: #fff3b8; border-color: #f1d96b; color: #8a6d1d; }
 .status--running { background: #cfe3f9; border-color: #85b4ec; color: #2e5a93; }
+.status--sleep   { background: #f6dfc1; border-color: #dfb481; color: #805c2c; }
 .status--done    { background: #c7ecd0; border-color: #86c99e; color: #3f7457; }
 
 /* ===================== Gantt chart ===================== */
 .gantt-wrap {
   overflow-x: auto;
   padding-bottom: 6px;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
 }
 .gantt {
-  --cell: 36px;
+  --cell: 43px;
   display: grid;
   grid-template-columns: 60px 1fr;
   gap: 8px;
@@ -516,11 +636,11 @@ input, select {
   font-size: 11px;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .gantt__time-row span {
-  text-align: center;
-  border-left: 1px dashed transparent;
+  justify-self: start;
+  line-height: 1;
 }
 .gantt__row {
   display: contents;
@@ -537,7 +657,7 @@ input, select {
 }
 .gantt__track {
   position: relative;
-  height: 30px;
+  height: 42px;
   display: grid;
   background-image:
     linear-gradient(to right, var(--line) 1px, transparent 1px);
@@ -545,16 +665,16 @@ input, select {
 }
 .gantt__block {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
+  top: 4px;
+  bottom: 4px;
   border-radius: 8px;
   border: 1px solid;
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 0 6px;
+  padding: 0 2px;
   font-weight: 700;
-  font-size: 11.5px;
+  font-size: 9.5px;
   overflow: hidden;
   white-space: nowrap;
   transition: width 0.2s ease;
@@ -576,7 +696,7 @@ input, select {
   padding: 18px 20px;
   width: min(1200px, 100%);
   max-height: 90vh;
-  overflow: auto;
+  overflow: hidden;
   box-shadow: 0 20px 50px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
@@ -588,9 +708,26 @@ input, select {
   align-items: center;
 }
 .modal__title { font-weight: 700; font-size: 17px; }
+.modal .result-card--expanded {
+  flex: 1 1 auto;
+}
+.modal .result-card--expanded .result-table-wrap {
+  max-height: none;
+}
 
 /* ===================== Hamster animations ===================== */
-.hamster--run { animation: bob 0.45s ease-in-out infinite alternate; }
+.hamster {
+  display: block;
+  flex: 0 0 auto;
+}
+.hamster--run {
+  object-fit: cover;
+  object-position: center bottom;
+}
+.hamster--idle {
+  object-fit: cover;
+  object-position: center bottom;
+}
 .hamster--sleep { animation: chew 0.45s ease-in-out infinite alternate; }
 @keyframes bob { to { transform: translateY(-2px); } }
 @keyframes chew { to { transform: rotate(-3deg); } }

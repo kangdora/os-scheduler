@@ -1,19 +1,35 @@
-import { CPU_COLORS, PROCESS_COLORS, READY_QUEUE_VISIBLE } from "../constants";
+import { CPU_COLORS, PROCESS_COLORS, READY_QUEUE_VISIBLE, type AlgorithmId } from "../constants";
 import type { CoreUI, ProcessUI } from "../state";
+import type { SimState } from "./AlgorithmPanel";
 import Hamster from "./Hamster";
+import hamsterSeedImg from "../asset/HamsterSeed.png";
 
 interface CoreBoxProps {
+  algorithm: AlgorithmId;
   cores: CoreUI[];
   setCores: (next: CoreUI[]) => void;
   processes: ProcessUI[];
   runningByCore: Map<string, string>;
   readyPids: string[];
+  readyPriorityByPid: Map<string, number>;
   sleepPids: string[];
+  simState: SimState;
   disabled: boolean;
 }
 
 export default function CoreBox(props: CoreBoxProps) {
-  const { cores, setCores, processes, runningByCore, readyPids, sleepPids, disabled } = props;
+  const {
+    algorithm,
+    cores,
+    setCores,
+    processes,
+    runningByCore,
+    readyPids,
+    readyPriorityByPid,
+    sleepPids,
+    simState,
+    disabled,
+  } = props;
 
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
 
@@ -36,12 +52,13 @@ export default function CoreBox(props: CoreBoxProps) {
           const cpuColor = CPU_COLORS[c.colorIdx % CPU_COLORS.length];
           const runningPid = runningByCore.get(c.coreId);
           const runningProc = runningPid ? procByPid.get(runningPid) : undefined;
+          const isRunning = simState === "running" && Boolean(runningProc);
           const wheelColor = runningProc
             ? PROCESS_COLORS[runningProc.colorIdx % PROCESS_COLORS.length]
             : cpuColor;
 
           return (
-            <div key={c.coreId} className={`cpu ${c.enabled ? "" : "cpu--off"} ${runningProc ? "cpu--running" : ""}`}>
+            <div key={c.coreId} className={`cpu ${c.enabled ? "" : "cpu--off"} ${isRunning ? "cpu--running" : ""}`}>
               <div className="cpu__label" style={{ color: cpuColor.pill }}>CPU {idx + 1}</div>
               <div
                 className="cpu__wheel"
@@ -49,10 +66,13 @@ export default function CoreBox(props: CoreBoxProps) {
               >
                 <div className="cpu__wheel-bg" style={{ background: cpuColor.bg }} />
                 <div className="cpu__wheel-inner">
-                  {runningProc ? (
-                    <Hamster bg={wheelColor.bg} border={wheelColor.border} size={48} variant="run" />
-                  ) : (
-                    <Hamster bg={cpuColor.bg} border={cpuColor.border} size={48} variant="idle" />
+                  {runningProc && (
+                    <Hamster
+                      bg={wheelColor.bg}
+                      border={wheelColor.border}
+                      size={120}
+                      variant="run"
+                    />
                   )}
                 </div>
                 <span className="cpu__num">{idx + 1}</span>
@@ -81,11 +101,9 @@ export default function CoreBox(props: CoreBoxProps) {
                 </button>
               </div>
 
-              {runningProc && (
-                <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
-                  {runningProc.pid} · {runningProc.name}
-                </div>
-              )}
+              <div className="cpu__process-name">
+                {runningProc ? `${runningProc.pid} · ${runningProc.name}` : ""}
+              </div>
             </div>
           );
         })}
@@ -103,7 +121,18 @@ export default function CoreBox(props: CoreBoxProps) {
                 <div key={i} className={`queue__cell ${proc ? "" : "queue__cell--empty"}`}>
                   {proc && color ? (
                     <>
-                      <Hamster bg={color.bg} border={color.border} size={28} />
+                      <Hamster
+                        bg={color.bg}
+                        border={color.border}
+                        size={32}
+                        variant={
+                          algorithm === "diet"
+                            ? "diet-ready"
+                            : (readyPriorityByPid.get(proc.pid) ?? 0) >= 60
+                              ? "fat"
+                              : "idle"
+                        }
+                      />
                       <span className="pid-pill" style={{ background: color.pill }}>{proc.pid}</span>
                     </>
                   ) : null}
@@ -126,8 +155,13 @@ export default function CoreBox(props: CoreBoxProps) {
                 const color = PROCESS_COLORS[proc.colorIdx % PROCESS_COLORS.length];
                 return (
                   <span key={pid} style={{ display: "inline-flex", alignItems: "center" }}>
-                    <Hamster bg={color.bg} border={color.border} size={32} variant="sleep" />
-                    <span className="sleep__seed" />
+                    <Hamster 
+                      bg={color.bg} 
+                      border={color.border} 
+                      size={34} 
+                      variant={algorithm === "diet" ? "diet-sleep" : "sleep"} 
+                    />
+                    {algorithm !== "diet" && <img src={hamsterSeedImg} alt="seed" className="sleep__seed-img" />}
                   </span>
                 );
               })
@@ -138,3 +172,4 @@ export default function CoreBox(props: CoreBoxProps) {
     </section>
   );
 }
+

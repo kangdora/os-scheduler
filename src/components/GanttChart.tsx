@@ -24,7 +24,7 @@ export default function GanttChart({
 }: GanttChartProps) {
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
   const ticks = Math.max(maxTime, 1);
-  const cellPx = expanded ? 48 : 36;
+  const cellPx = expanded ? 58 : 43;
   const tickGridTemplate = `repeat(${ticks}, ${cellPx}px)`;
 
   const blocksByCore = new Map<string, ExecutionBlock[]>();
@@ -57,11 +57,18 @@ export default function GanttChart({
         >
           <div className="gantt__label">시간</div>
           <div className="gantt__time-row" style={{ gridTemplateColumns: tickGridTemplate }}>
-            {Array.from({ length: ticks }).map((_, i) => (
-              <span key={i}>{i + 1}</span>
+            {Array.from({ length: ticks + 1 }).map((_, i) => (
+              <span 
+                key={i} 
+                style={{ 
+                  transform: "translateX(-50%)",
+                  gridColumnStart: i + 1,
+                }}
+              >
+                {i}
+              </span>
             ))}
           </div>
-
           {cores.map((c, idx) => {
             const cpuColor = CPU_COLORS[c.colorIdx % CPU_COLORS.length];
             const blocks = blocksByCore.get(c.coreId) ?? [];
@@ -100,7 +107,7 @@ export default function GanttChart({
                         }}
                         title={`${proc.pid} ${proc.name} (${b.start_time}-${b.end_time})`}
                       >
-                        {width >= 36 && (
+                        {width >= 43 && (
                           <Hamster bg={color.bg} border={color.border} size={20} />
                         )}
                         <span>{proc.pid}</span>

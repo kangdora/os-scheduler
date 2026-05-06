@@ -2,7 +2,7 @@ import { PROCESS_COLORS } from "../constants";
 import type { ProcessUI } from "../state";
 import type { ProcessMetric } from "../pyodide";
 
-export type ProcStatus = "waiting" | "running" | "done";
+export type ProcStatus = "waiting" | "running" | "sleep" | "done";
 
 interface ResultTableProps {
   processes: ProcessUI[];
@@ -16,6 +16,7 @@ interface ResultTableProps {
 const STATUS_LABEL: Record<ProcStatus, { label: string; cls: string }> = {
   waiting: { label: "대기 중", cls: "status--waiting" },
   running: { label: "실행 중", cls: "status--running" },
+  sleep: { label: "I/O 대기 중", cls: "status--sleep" },
   done: { label: "완료", cls: "status--done" },
 };
 
@@ -30,7 +31,7 @@ export default function ResultTable({
   const metricByPid = new Map(metrics.map((m) => [m.pid, m]));
 
   return (
-    <section className="card">
+    <section className={`card result-card ${expanded ? "result-card--expanded" : ""}`}>
       <div className="result-head">
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span aria-hidden>🐹</span>
@@ -46,10 +47,7 @@ export default function ResultTable({
         )}
       </div>
 
-      <div
-        className="result-table-wrap"
-        style={expanded ? { maxHeight: "70vh" } : undefined}
-      >
+      <div className="result-table-wrap">
         <table className="result-table">
           <thead>
             <tr>
@@ -74,9 +72,9 @@ export default function ResultTable({
                   <td><span className="pid-pill" style={{ background: color.pill }}>{p.pid}</span></td>
                   <td>{p.name}</td>
                   <td>{p.arrivalTime}</td>
-                  <td>{p.burstTime}</td>
-                  <td>{m && status === "done" ? m.tt.toFixed(1) : "—"}</td>
-                  <td>{m && status === "done" ? m.wt.toFixed(1) : "—"}</td>
+                  <td>{m && status === "done" ? m.bt : "—"}</td>
+                  <td>{m && status === "done" ? m.tt : "—"}</td>
+                  <td>{m && status === "done" ? m.wt : "—"}</td>
                   <td>{m && status === "done" ? m.ntt.toFixed(2) : "—"}</td>
                   <td><span className={`status ${s.cls}`}>{s.label}</span></td>
                 </tr>

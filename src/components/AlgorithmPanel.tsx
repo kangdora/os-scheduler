@@ -30,7 +30,7 @@ export default function AlgorithmPanel(props: AlgorithmPanelProps) {
   const editsDisabled = simState === "running";
 
   return (
-    <section className="card algo-panel">
+    <section className="algo-panel">
       <div className="card__title">
         <span aria-hidden>🐹</span>
         <span>알고리즘 선택</span>

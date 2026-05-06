@@ -34,7 +34,7 @@ export default function ProcessBox({ processes, setProcesses, disabled, showAppe
   };
 
   return (
-    <section className="card">
+    <section className="process-panel">
       <div className="card__title card__title--row">
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span aria-hidden>🐹</span>
