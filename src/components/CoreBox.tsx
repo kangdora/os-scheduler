@@ -18,7 +18,18 @@ interface CoreBoxProps {
 }
 
 export default function CoreBox(props: CoreBoxProps) {
-  const { cores, setCores, processes, runningByCore, readyPids, readyPriorityByPid, sleepPids, simState, disabled } = props;
+  const {
+    algorithm,
+    cores,
+    setCores,
+    processes,
+    runningByCore,
+    readyPids,
+    readyPriorityByPid,
+    sleepPids,
+    simState,
+    disabled,
+  } = props;
 
   const procByPid = new Map(processes.map((p) => [p.pid, p]));
 
