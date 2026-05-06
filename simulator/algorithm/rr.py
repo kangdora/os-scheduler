@@ -14,6 +14,7 @@ class RR:
         ready_queue: deque[Process] = deque([])
         timeline: list[ExecutionBlock] = []
         completion_time: dict[str, int] = {}
+        remaining_work_by_pid = {process.pid: process.burst_time for process in processes}
 
         priority_cores = sorted(cores, key=lambda c: 0 if c.core_type == "P" else 1)
 
@@ -30,7 +31,16 @@ class RR:
 
         time_slice_used = {c.core_id: 0 for c in priority_cores}
 
-        return remain_queue, ready_queue, timeline, completion_time, priority_cores, runtime, time_slice_used
+        return (
+            remain_queue,
+            ready_queue,
+            timeline,
+            completion_time,
+            remaining_work_by_pid,
+            priority_cores,
+            runtime,
+            time_slice_used,
+        )
 
     def _has_running_core(self, priority_cores: list[Core], runtime: dict) -> bool:
         return any(runtime[c.core_id].current_process is not None for c in priority_cores)
@@ -46,6 +56,7 @@ class RR:
         ready_queue: deque[Process],
         time: int,
         time_slice_used: dict,
+        remaining_work_by_pid: dict[str, int],
     ) -> None:
         for core in priority_cores:
             core_runtime = runtime[core.core_id]
@@ -53,10 +64,8 @@ class RR:
             if core_runtime.current_process is None and ready_queue:
                 process = ready_queue.popleft()
 
-                if core_runtime.remaining_work == 0:
-                    core_runtime.remaining_work = process.burst_time
-
                 core_runtime.current_process = process
+                core_runtime.remaining_work = remaining_work_by_pid[process.pid]
                 core_runtime.start_time = time
                 core_runtime.elapsed_time = 0
 
@@ -72,6 +81,7 @@ class RR:
         time_quantum: int,
         ready_queue: deque,
         time_slice_used: dict,
+        remaining_work_by_pid: dict[str, int],
     ) -> None:
 
         for core in priority_cores:
@@ -95,6 +105,7 @@ class RR:
             processed = min(core_runtime.remaining_work, processable)
 
             core_runtime.remaining_work -= processed
+            remaining_work_by_pid[process.pid] = core_runtime.remaining_work
             core_runtime.elapsed_time += 1
             time_slice_used[core.core_id] += 1
 
@@ -113,8 +124,10 @@ class RR:
                 )
 
                 completion_time[process.pid] = finished_at
+                remaining_work_by_pid[process.pid] = 0
 
                 core_runtime.current_process = None
+                core_runtime.remaining_work = 0
                 core_runtime.elapsed_time = 0
                 time_slice_used[core.core_id] = 0
                 core_runtime.was_active_last_tick = False
@@ -132,6 +145,7 @@ class RR:
                 ready_queue.append(process)
 
                 core_runtime.current_process = None
+                core_runtime.remaining_work = 0
                 core_runtime.start_time = 0
                 core_runtime.was_active_last_tick = False
                 time_slice_used[core.core_id] = 0
@@ -143,14 +157,21 @@ class RR:
         completion_time: dict[str, int],
     ) -> ScheduleResult:
 
+        calc_bt: dict[str, int] = {p.pid: 0 for p in processes}
+        for block in timeline:
+            if block.pid is None:
+                continue
+            calc_bt[block.pid] += block.end_time - block.start_time
+
         process_metrics = []
         total_wt = 0.0
         total_ntt = 0.0
 
         for p in sorted(processes, key=lambda x: x.pid):
-            tt = completion_time[p.pid] - p.arrival_time
-            wt = tt - p.burst_time
-            ntt = tt / p.burst_time
+            tt = max(0.0, float(completion_time[p.pid] - p.arrival_time))
+            bt = float(calc_bt[p.pid])
+            wt = max(0.0, tt - bt)
+            ntt = tt / bt if bt > 0 else 0.0
 
             total_wt += wt
             total_ntt += ntt
@@ -177,6 +198,7 @@ class RR:
             ready_queue,
             timeline,
             completion_time,
+            remaining_work_by_pid,
             priority_cores,
             runtime,
             time_slice_used,
@@ -193,7 +215,7 @@ class RR:
             self._move_arrived(remain_queue, ready_queue, time)
 
             self._assign_to_idle_cores(
-                priority_cores, runtime, ready_queue, time, time_slice_used
+                priority_cores, runtime, ready_queue, time, time_slice_used, remaining_work_by_pid
             )
 
             self._tick_execute(
@@ -205,6 +227,7 @@ class RR:
                 time_quantum,
                 ready_queue,
                 time_slice_used,
+                remaining_work_by_pid,
             )
 
             time += 1

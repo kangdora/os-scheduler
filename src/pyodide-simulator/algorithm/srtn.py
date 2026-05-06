@@ -206,14 +206,21 @@ class SRTN:
                 WT = max(0, TT - burst)
                 NTT = max(1, TT / burst)
                 """
+        calc_bt: dict[str, int] = {p.pid: 0 for p in processes}
+        for block in timeline:
+            if block.pid is None:
+                continue
+            calc_bt[block.pid] += block.end_time - block.start_time
+
         process_metrics: list[ProcessMetric] = []
         total_wt = 0.0
         total_ntt = 0.0
         for process in sorted(processes, key=lambda x: x.pid):
             at = process.arrival_time
             tt = max(0.0, float(completion_time[process.pid] - at))
-            wt = max(0.0, tt - float(process.burst_time))
-            ntt = max(1.0, tt / float(process.burst_time))
+            bt = float(calc_bt[process.pid])
+            wt = max(0.0, tt - bt)
+            ntt = tt / bt if bt > 0 else 0.0
             total_wt += wt
             total_ntt += ntt
             process_metrics.append(ProcessMetric(pid=process.pid, at=at, tt=tt, wt=wt, ntt=ntt))

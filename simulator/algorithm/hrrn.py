@@ -120,14 +120,21 @@ class HRRN:
         completion_time: dict[str, int],
     ) -> ScheduleResult:
 
+        calc_bt: dict[str, int] = {p.pid: 0 for p in processes}
+        for block in timeline:
+            if block.pid is None:
+                continue
+            calc_bt[block.pid] += block.end_time - block.start_time
+
         process_metrics = []
         total_wt = 0.0
         total_ntt = 0.0
 
         for p in sorted(processes, key=lambda x: x.pid):
-            tt = completion_time[p.pid] - p.arrival_time
-            wt = tt - p.burst_time
-            ntt = tt / p.burst_time
+            tt = max(0.0, float(completion_time[p.pid] - p.arrival_time))
+            bt = float(calc_bt[p.pid])
+            wt = max(0.0, tt - bt)
+            ntt = tt / bt if bt > 0 else 0.0
 
             total_wt += wt
             total_ntt += ntt

@@ -343,11 +343,11 @@ class DIET:
             ready_queue_priorities: list[ReadyQueuePrioritySnapshot],
     ) -> ScheduleResult:
         """FCFS와 같은 방식으로 TT/WT/NTT 메트릭과 결과를 만든다."""
-        service_ticks: dict[str, int] = {}
+        calc_bt: dict[str, int] = {p.pid: 0 for p in processes}
         for block in timeline:
             if block.pid is None or block.processor_id == "eating_queue":
                 continue
-            service_ticks[block.pid] = service_ticks.get(block.pid, 0) + (block.end_time - block.start_time)
+            calc_bt[block.pid] += block.end_time - block.start_time
 
         process_metrics: list[ProcessMetric] = []
         total_wt = 0.0
@@ -355,9 +355,9 @@ class DIET:
         for process in sorted(processes, key=lambda x: x.pid):
             at = process.arrival_time
             tt = max(0.0, float(completion_time[process.pid] - at))
-            service_time = float(service_ticks.get(process.pid, 0))
-            wt = max(0.0, tt - service_time)
-            ntt = tt / service_time if service_time > 0 else 0.0
+            bt = float(calc_bt[process.pid])
+            wt = max(0.0, tt - bt)
+            ntt = tt / bt if bt > 0 else 0.0
             total_wt += wt
             total_ntt += ntt
             process_metrics.append(ProcessMetric(pid=process.pid, at=at, tt=tt, wt=wt, ntt=ntt))
