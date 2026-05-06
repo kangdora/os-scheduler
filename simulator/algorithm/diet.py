@@ -25,7 +25,6 @@ class DIET:
         self.long_run_threshold = 4
         self.long_run_decay = 0.85
         self.cpu_drop_decay = 0.75
-        self.appetite_priority_weight = 10
         self.random_seed = 0
         self.random = random.Random(self.random_seed)
 
@@ -50,7 +49,7 @@ class DIET:
     def _init_runtime(self, processes: list[DietProcess], cores: list[Core]):
         # priority는 DIET의 동적 점수이고, appetite는 초기 우선순위와 tick별 I/O interrupt 확률에 사용한다.
         for process in processes:
-            process.priority = (process.appetite / 100.0) * self.appetite_priority_weight
+            process.priority = 0
             process.enter_bonus = 0.0
             process.enter_bonus_ticks = 0
             process.long_decay_applied = False
