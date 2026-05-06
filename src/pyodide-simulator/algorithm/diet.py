@@ -25,6 +25,7 @@ class DIET:
         self.long_run_threshold = 4
         self.long_run_decay = 0.85
         self.cpu_drop_decay = 0.75
+        self.ready_wait_cap = 40
         self.random_seed = 0
         self.random = random.Random(self.random_seed)
 
@@ -47,7 +48,7 @@ class DIET:
             self._push_ready(ready_queue, process)
 
     def _init_runtime(self, processes: list[DietProcess], cores: list[Core]):
-        # priority는 DIET의 동적 점수이고, appetite는 초기 우선순위와 tick별 I/O interrupt 확률에 사용한다.
+        # priority는 DIET의 동적 점수이고, appetite는 시뮬레이션용 tick별 I/O interrupt 확률이다.
         for process in processes:
             process.priority = 0
             process.enter_bonus = 0.0
@@ -302,7 +303,7 @@ class DIET:
         """1틱 동안 ready 큐에 남아 있던 프로세스의 priority를 올리고 enter_bonus를 만료한다."""
         ready_processes = [item[2] for item in ready_queue]
         for process in ready_processes:
-            process.priority += self.ready_wait_gain
+            process.priority = min(process.priority + self.ready_wait_gain, self.ready_wait_cap)
 
         for process in processes:
             if process.enter_bonus_ticks > 0:
