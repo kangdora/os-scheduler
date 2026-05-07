@@ -154,7 +154,7 @@ class FCFS:
             ntt = tt / bt if bt > 0 else 0.0
             total_wt += wt
             total_ntt += ntt
-            process_metrics.append(ProcessMetric(pid=process.pid, at=at, tt=tt, wt=wt, ntt=ntt))
+            process_metrics.append(ProcessMetric(pid=process.pid, at=at, bt=bt, tt=tt, wt=wt, ntt=ntt))
 
         process_count = len(processes)
         avg_wt = total_wt / process_count if process_count else 0.0

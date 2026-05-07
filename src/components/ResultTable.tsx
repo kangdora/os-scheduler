@@ -63,9 +63,9 @@ export default function ResultTable({
                   <td><span className="pid-pill" style={{ background: color.pill }}>{p.pid}</span></td>
                   <td>{p.name}</td>
                   <td>{p.arrivalTime}</td>
-                  <td>{p.burstTime}</td>
-                  <td>{m ? m.tt.toFixed(1) : "—"}</td>
-                  <td>{m ? m.wt.toFixed(1) : "—"}</td>
+                  <td>{m ? Math.trunc(m.bt) : "—"}</td>
+                  <td>{m ? Math.trunc(m.tt) : "—"}</td>
+                  <td>{m ? Math.trunc(m.wt) : "—"}</td>
                   <td>{m ? m.ntt.toFixed(2) : "—"}</td>
                 </tr>
               );

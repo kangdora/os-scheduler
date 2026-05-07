@@ -66,6 +66,7 @@ export interface ExecutionBlock {
 export interface ProcessMetric {
   pid: string;
   at: number;
+  bt: number;
   tt: number;
   wt: number;
   ntt: number;

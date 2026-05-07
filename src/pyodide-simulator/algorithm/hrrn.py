@@ -140,7 +140,7 @@ class HRRN:
             total_ntt += ntt
 
             process_metrics.append(
-                ProcessMetric(pid=p.pid, at=p.arrival_time, tt=tt, wt=wt, ntt=ntt)
+                ProcessMetric(pid=p.pid, at=p.arrival_time, bt=bt, tt=tt, wt=wt, ntt=ntt)
             )
 
         n = len(processes)

@@ -34,6 +34,7 @@ class ExecutionBlock:
 class ProcessMetric:
     pid: str
     at: int
+    bt: float
     tt: float
     wt: float
     ntt: float
