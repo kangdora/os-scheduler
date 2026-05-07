@@ -29,18 +29,18 @@ class DIET:
         self.random_seed = 0
         self.random = random.Random(self.random_seed)
 
-    def _score(self, process: DietProcess, running_bonus: float = 0.0) -> float:
+    def _score(self, process: DietProcess, running_bonus: int = 0) -> int:
         """DIET 스케줄링 점수: priority + enter_bonus + running_bonus."""
         return process.priority + process.enter_bonus + running_bonus
 
-    def _ready_item(self, process: DietProcess) -> tuple[float, str, DietProcess]:
+    def _ready_item(self, process: DietProcess) -> tuple[int, str, DietProcess]:
         # heapq는 최소 힙이므로 -score를 저장해 점수가 높은 프로세스가 먼저 나오게 한다.
         return -self._score(process), process.pid, process
 
-    def _push_ready(self, ready_queue: list[tuple[float, str, DietProcess]], process: DietProcess) -> None:
+    def _push_ready(self, ready_queue: list[tuple[int, str, DietProcess]], process: DietProcess) -> None:
         heapq.heappush(ready_queue, self._ready_item(process))
 
-    def _rebuild_ready_queue(self, ready_queue: list[tuple[float, str, DietProcess]]) -> None:
+    def _rebuild_ready_queue(self, ready_queue: list[tuple[int, str, DietProcess]]) -> None:
         # ready 대기 중 priority/enter_bonus가 바뀌면 heap key도 바뀌므로 heap을 다시 만든다.
         ready_processes = [item[2] for item in ready_queue]
         ready_queue.clear()
@@ -51,12 +51,12 @@ class DIET:
         # priority는 DIET의 동적 점수이고, appetite는 시뮬레이션용 tick별 I/O interrupt 확률이다.
         for process in processes:
             process.priority = 0
-            process.enter_bonus = 0.0
+            process.enter_bonus = 0
             process.enter_bonus_ticks = 0
             process.long_decay_applied = False
 
         remain_queue = deque(sorted(processes, key=lambda p: (p.arrival_time, p.pid)))
-        ready_queue: list[tuple[float, str, DietProcess]] = []  # (-score, pid, diet_process)
+        ready_queue: list[tuple[int, str, DietProcess]] = []  # (-score, pid, diet_process)
         eating_queue: list[tuple[int, DietProcess]] = []  # (ready_time, diet_process)
 
         timeline: list[ExecutionBlock] = []
@@ -97,7 +97,7 @@ class DIET:
     def _move_arrived(
             self,
             remain_queue: deque[DietProcess],
-            ready_queue: list[tuple[float, str, DietProcess]],
+            ready_queue: list[tuple[int, str, DietProcess]],
             eating_queue: list[tuple[int, DietProcess]],
             time: int,
     ) -> None:
@@ -134,13 +134,13 @@ class DIET:
         """CPU에서 내려올 때 I/O나 long decay가 없었던 짧은 실행에는 priority 감점을 적용한다."""
         if caused_by_io or process.long_decay_applied:
             return
-        process.priority *= self.cpu_drop_decay
+        process.priority = int(process.priority * self.cpu_drop_decay)
 
     def _preempt_core(
             self,
             core: Core,
             runtime: dict[str, ProcessorRuntime],
-            ready_queue: list[tuple[float, str, DietProcess]],
+            ready_queue: list[tuple[int, str, DietProcess]],
             timeline: list[ExecutionBlock],
             remaining_work: dict[str, int],
             running_process: dict[str, DietProcess],
@@ -168,7 +168,7 @@ class DIET:
             self,
             priority_cores: list[Core],
             runtime: dict[str, ProcessorRuntime],
-            ready_queue: list[tuple[float, str, DietProcess]],
+            ready_queue: list[tuple[int, str, DietProcess]],
             timeline: list[ExecutionBlock],
             remaining_work: dict[str, int],
             running_process: dict[str, DietProcess],
@@ -248,7 +248,7 @@ class DIET:
                     and not process.long_decay_applied
             ):
                 # CPU 연속 실행이 4초 이상이면 priority를 낮추고, 하차 시 추가 감점은 면제한다.
-                process.priority *= self.long_run_decay
+                process.priority = int(process.priority * self.long_run_decay)
                 process.long_decay_applied = True
 
             if core_runtime.remaining_work == 0:
@@ -297,7 +297,7 @@ class DIET:
 
     def _age_ready_queue(
             self,
-            ready_queue: list[tuple[float, str, DietProcess]],
+            ready_queue: list[tuple[int, str, DietProcess]],
             processes: list[DietProcess],
     ) -> None:
         """1틱 동안 ready 큐에 남아 있던 프로세스의 priority를 올리고 enter_bonus를 만료한다."""
@@ -309,14 +309,14 @@ class DIET:
             if process.enter_bonus_ticks > 0:
                 process.enter_bonus_ticks -= 1
                 if process.enter_bonus_ticks == 0:
-                    process.enter_bonus = 0.0
+                    process.enter_bonus = 0
 
         self._rebuild_ready_queue(ready_queue)
 
     def _record_ready_queue_priorities(
             self,
             ready_queue_priorities: list[ReadyQueuePrioritySnapshot],
-            ready_queue: list[tuple[float, str, DietProcess]],
+            ready_queue: list[tuple[int, str, DietProcess]],
             time: int,
     ) -> None:
         ready_processes = sorted((item[2] for item in ready_queue), key=lambda p: (-self._score(p), p.pid))

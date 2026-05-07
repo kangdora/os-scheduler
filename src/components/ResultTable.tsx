@@ -13,13 +13,6 @@ interface ResultTableProps {
   expanded?: boolean;
 }
 
-const STATUS_LABEL: Record<ProcStatus, { label: string; cls: string }> = {
-  waiting: { label: "대기 중", cls: "status--waiting" },
-  running: { label: "실행 중", cls: "status--running" },
-  sleep: { label: "I/O 대기 중", cls: "status--sleep" },
-  done: { label: "완료", cls: "status--done" },
-};
-
 export default function ResultTable({
   processes,
   metrics,
@@ -28,6 +21,7 @@ export default function ResultTable({
   onExpand,
   expanded,
 }: ResultTableProps) {
+  void statusByPid;
   const metricByPid = new Map(metrics.map((m) => [m.pid, m]));
 
   return (
@@ -58,25 +52,21 @@ export default function ResultTable({
               <th>TT</th>
               <th>WT</th>
               <th>NTT</th>
-              <th>상태</th>
             </tr>
           </thead>
           <tbody>
             {processes.map((p) => {
               const color = PROCESS_COLORS[p.colorIdx % PROCESS_COLORS.length];
               const m = metricByPid.get(p.pid);
-              const status = statusByPid.get(p.pid) ?? "waiting";
-              const s = STATUS_LABEL[status];
               return (
                 <tr key={p.pid}>
                   <td><span className="pid-pill" style={{ background: color.pill }}>{p.pid}</span></td>
                   <td>{p.name}</td>
                   <td>{p.arrivalTime}</td>
                   <td>{p.burstTime}</td>
-                  <td>{m && status === "done" ? m.tt.toFixed(1) : "—"}</td>
-                  <td>{m && status === "done" ? m.wt.toFixed(1) : "—"}</td>
-                  <td>{m && status === "done" ? m.ntt.toFixed(2) : "—"}</td>
-                  <td><span className={`status ${s.cls}`}>{s.label}</span></td>
+                  <td>{m ? m.tt.toFixed(1) : "—"}</td>
+                  <td>{m ? m.wt.toFixed(1) : "—"}</td>
+                  <td>{m ? m.ntt.toFixed(2) : "—"}</td>
                 </tr>
               );
             })}
