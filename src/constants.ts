@@ -3,12 +3,12 @@ export const READY_QUEUE_VISIBLE = 5;
 export const CPU_COUNT = 4;
 
 export const ALGORITHMS = [
-  { id: "fcfs", label: "FCFS (선착순)" },
-  { id: "rr", label: "Round Robin (RR)" },
+  { id: "fcfs", label: "FCFS" },
+  { id: "rr", label: "RR" },
   { id: "hrrn", label: "HRRN" },
   { id: "spn", label: "SPN" },
   { id: "srtn", label: "SRTN" },
-  { id: "diet", label: "Diet (다이어트)" },
+  { id: "diet", label: "DIET" },
 ] as const;
 
 export type AlgorithmId = (typeof ALGORITHMS)[number]["id"];
