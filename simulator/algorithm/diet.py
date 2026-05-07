@@ -242,11 +242,7 @@ class DIET:
             core_runtime.was_active_last_tick = True
             core_runtime.elapsed_time += 1
 
-            if (
-                    isinstance(process, DietProcess)
-                    and core_runtime.elapsed_time >= self.long_run_threshold
-                    and not process.long_decay_applied
-            ):
+            if core_runtime.elapsed_time >= self.long_run_threshold and not process.long_decay_applied:
                 # CPU 연속 실행이 4초 이상이면 priority를 낮추고, 하차 시 추가 감점은 면제한다.
                 process.priority = int(process.priority * self.long_run_decay)
                 process.long_decay_applied = True
@@ -268,7 +264,7 @@ class DIET:
                 core_runtime.elapsed_time = 0
                 continue
 
-            if isinstance(process, DietProcess) and self.random.random() < (process.appetite / 100.0):
+            if self.random.random() < (process.appetite / 100.0):
                 interrupted_at = time + 1
                 timeline.append(
                     ExecutionBlock(
