@@ -31,7 +31,7 @@ export default function ResultTable({
           <span aria-hidden>🐹</span>
           <span style={{ fontWeight: 700, fontSize: 15 }}>프로세스 상태 요약</span>
           <span className="energy-badge" title="총 전기 사용량">
-            ⚡ {energy.toFixed(1)}
+            ⚡ {energy.toFixed(1)} W
           </span>
         </div>
         {onExpand && (
