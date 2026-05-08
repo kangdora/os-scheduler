@@ -130,7 +130,6 @@ class RR:
                 core_runtime.remaining_work = 0
                 core_runtime.elapsed_time = 0
                 time_slice_used[core.core_id] = 0
-                core_runtime.was_active_last_tick = False
 
             elif time_slice_used[core.core_id] >= time_quantum:
                 timeline.append(
@@ -147,7 +146,6 @@ class RR:
                 core_runtime.current_process = None
                 core_runtime.remaining_work = 0
                 core_runtime.start_time = 0
-                core_runtime.was_active_last_tick = False
                 time_slice_used[core.core_id] = 0
 
     def _build_result(

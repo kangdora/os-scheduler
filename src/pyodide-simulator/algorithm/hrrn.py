@@ -111,7 +111,6 @@ class HRRN:
 
                 core_runtime.current_process = None
                 core_runtime.elapsed_time = 0
-                core_runtime.was_active_last_tick = False
 
     def _build_result(
         self,

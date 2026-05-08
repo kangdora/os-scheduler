@@ -125,7 +125,6 @@ class SPN:
                 )
                 completion_time[process.pid] = finished_at
                 core_runtime.current_process = None
-                core_runtime.was_active_last_tick = False
                 core_runtime.elapsed_time = 0
 
     def _build_result(

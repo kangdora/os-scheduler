@@ -208,7 +208,6 @@ class DIET:
             _, _, process = heapq.heappop(ready_queue)
             preempt_runtime = runtime[preempt_core.core_id]
             self._start_on_core(preempt_runtime, process, remaining_work, time)
-            preempt_runtime.was_active_last_tick = False
             running_process[preempt_core.core_id] = process
 
     def _tick_execute(
@@ -260,7 +259,6 @@ class DIET:
                 completion_time[process.pid] = finished_at
                 running_process.pop(core.core_id, None)
                 core_runtime.current_process = None
-                core_runtime.was_active_last_tick = False
                 core_runtime.elapsed_time = 0
                 continue
 
@@ -288,7 +286,6 @@ class DIET:
                     )
                 )
                 core_runtime.current_process = None
-                core_runtime.was_active_last_tick = False
                 core_runtime.elapsed_time = 0
 
     def _age_ready_queue(
